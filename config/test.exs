@@ -14,6 +14,6 @@ config :pamela, Pamela.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
-  database: "pamela_test",
-  hostname: "localhost",
+  database: "pamela_bot_test",
+  hostname: "db",
   pool: Ecto.Adapters.SQL.Sandbox

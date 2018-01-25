@@ -41,7 +41,7 @@ config :pamela, Pamela.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
   password: "postgres",
-  database: "pamela_dev",
+  database: "pamela_bot_dev",
   hostname: "db",
   pool_size: 10
 

@@ -11,7 +11,7 @@ config :pamela,
 
 # Configures the endpoint
 config :pamela, PamelaWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: "dev"],
   secret_key_base: "XVurpsSlWBXqedTs+a4q9q94t9aFQKvRrM5ocecxguEyseaufyCDfnouUaRKDbYE",
   render_errors: [view: PamelaWeb.ErrorView, accepts: ~w(json)],
   pubsub: [name: Pamela.PubSub,

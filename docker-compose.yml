@@ -1,0 +1,19 @@
+version: "3.3"
+services:
+  db:
+    image: postgres
+    ports:
+      - "5432"
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ./script/start.sh
+    env_file: .env
+    image: 'pamela_bot'
+    volumes:
+      - .:/app
+    ports:
+      - "4000:4000"
+    depends_on:
+      - db
