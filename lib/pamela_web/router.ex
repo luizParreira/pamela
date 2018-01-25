@@ -5,11 +5,8 @@ defmodule PamelaWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", PamelaWeb do
+  scope "/pamela", PamelaWeb do
     pipe_through :api
-
-    token = Application.get_env(:pamela, :bot_token)
-
-    post "/pamela/#{token}", PamelaWeb.MessagesController
+    post "/telegram/:token", MessagesController, :handle
   end
 end

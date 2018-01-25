@@ -1,8 +1,8 @@
 defmodule PamelaWeb.MessagesController do
-  use Application.Web, :controller
+  use PamelaWeb, :controller
 
   def handle(conn, params) do
-    IO.puts params
+    IO.inspect params
     json(conn, %{success: true})
   end
 end
