@@ -8,6 +8,7 @@ defmodule Pamela.Command.TelegramCommand do
   schema "telegram_commands" do
     field :command, :string
     field :telegram_user_id, :integer
+    field :executed, :boolean
 
     timestamps()
   end
@@ -15,7 +16,7 @@ defmodule Pamela.Command.TelegramCommand do
   @doc false
   def changeset(%TelegramCommand{} = telegram_command, attrs) do
     telegram_command
-    |> cast(attrs, [:update_id, :command, :telegram_user_id])
-    |> validate_required([:update_id, :command, :telegram_user_id])
+    |> cast(attrs, [:update_id, :command, :telegram_user_id, :executed])
+    |> validate_required([:update_id, :command, :telegram_user_id, :executed])
   end
 end

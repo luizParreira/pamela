@@ -1,26 +1,39 @@
 defmodule Pamela.Command.Handler do
-  alias Nadia.Model.User
+  alias Nadia.Model.{User, Message}
   alias Pamela.User.TelegramUser
   alias Pamela.Command.TelegramCommand
   alias Pamela.Command
   alias Pamela.Command.Executor
 
-  def handle(id, command, %User{} = user) do
-    {:ok, %TelegramUser{} = user} = parse_user(user)
+  def handle(id, %Message{} = message, :command) do
+    {:ok, %TelegramUser{} = user} = parse_user(message.from)
 
     case Command.get_telegram_command(id) do
-      nil -> save_and_execute_cmd(id, command, user)
+      nil -> save_and_execute_cmd(id, message, user)
       %TelegramCommand{} = _cmd -> {:ok, :handled_command}
     end
   end
 
-  defp save_and_execute_cmd(id, command, user) do
+  def handle(id, %Message{} = message, :message) do
+    {:ok, %TelegramUser{} = user} = parse_user(message.from)
+
+    case Command.get_telegram_command_by(user.id, false) do
+      [] -> {:error, :handled_command}
+      [command] -> Executor.execute(command, message, user)
+      [command | _commands] -> Executor.execute(command, message, user)
+    end
+  end
+
+  def handle(_id, _msg, _flag), do: {:error, :unknown_message}
+
+  defp save_and_execute_cmd(id, message, user) do
     case Command.create_telegram_command(%{
            update_id: id,
-           command: command,
-           telegram_user_id: user.id
+           command: message.text,
+           telegram_user_id: user.id,
+           executed: false
          }) do
-      {:ok, command} -> Executor.execute(command, user)
+      {:ok, command} -> Executor.execute(command, message, user)
       {:error, error} -> {:error, error}
     end
   end
