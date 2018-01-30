@@ -14,4 +14,8 @@ defmodule Pamela.Command.Executor do
   defp execute_command("/trade", command, message, user) do
     Command.Trade.run(command, message, user)
   end
+
+  defp execute_command("/halt", command, _message, user) do
+    Command.Halt.run(command, user)
+  end
 end

@@ -12,7 +12,10 @@ defmodule Pamela.MessageHandler do
   defp parse_updates(nil), do: []
   defp parse_updates([]), do: []
   defp parse_updates([head | updates]) do
-    parse_update(head)
+    case Command.get_telegram_command(head.update_id) do
+      nil -> parse_update(head)
+      _ -> {:error, :already_parsed}
+    end
     parse_updates(updates)
   end
 

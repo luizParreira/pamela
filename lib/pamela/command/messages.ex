@@ -7,8 +7,8 @@ defmodule Pamela.Command.Messages do
 
     Here are the list of commands I currently support:
 
-    💸 /trade - Start trading session. 1 - set name. 2 - set coins. 3 - set period. 4 - confirm
-    ✋ /halt - Stop the current trading session. Or, do othing if not tradin.
+    💸 /trade - Start trading session. Or, do nothing if already trading.
+    ✋ /halt - Stop the current trading session. Or, do othing if not tradig.
     """
   end
 
@@ -70,6 +70,26 @@ defmodule Pamela.Command.Messages do
 
     Can I start trading with the above information?
     yes or no
+    """
+  end
+
+  def existing_session(session) do
+    """
+    You already have #{session.name} going!
+
+    Please, run /halt to stop it!
+    """
+  end
+
+  def no_session do
+    "You have no trading session created, please run /trade, in order to start"
+  end
+
+  def session_halted(session) do
+    """
+    Stoping session #{session.name}, now!
+
+    See you laterr😎
     """
   end
 end

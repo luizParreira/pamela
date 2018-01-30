@@ -5,6 +5,25 @@ defmodule Pamela.Command.Trade do
   alias Pamela.Trading
 
   def run(command, message, user) do
+    case Trading.get_session_by(user.id, true) do
+      [] -> run_cmd(command, message, user)
+      [session] ->
+        if session.command_id != command.update_id do
+          resolve_current_command(user, command, session)
+        else
+          run_cmd(command, message, user)
+        end
+    end
+  end
+
+  defp resolve_current_command(user, command, session) do
+    case Command.update_telegram_command(command, %{executed: true}) do
+      {:ok, _cmd} -> Nadia.send_message(user.id, Messages.existing_session(session))
+      _ -> {:error, :couldnt_update_command}
+    end
+  end
+
+  defp run_cmd(command, message, user) do
     case Command.get_telegram_command_message_by(command.update_id) do
       [] -> run_intro(command, message, user)
       [command_msg] -> run(command_msg.message, command, message, user)
@@ -27,7 +46,12 @@ defmodule Pamela.Command.Trade do
   end
 
   defp run("trade_intro", command, message, user) do
-    case Trading.create_session(%{name: message.text, telegram_user_id: user.id, running: true}) do
+    case Trading.create_session(%{
+           name: message.text,
+           telegram_user_id: user.id,
+           running: true,
+           command_id: command.update_id
+         }) do
       {:ok, sess} -> run_coins(command, user)
       error -> error
     end
@@ -44,7 +68,7 @@ defmodule Pamela.Command.Trade do
     case String.split(message.text, ",") do
       [] -> {:error, :unknown_coins}
       [coin] -> {:error, :only_one_coin}
-      [base |  coins] -> get_trading_session(base, coins, user, command)
+      [base | coins] -> get_trading_session(base, coins, user, command)
     end
   end
 
@@ -56,21 +80,22 @@ defmodule Pamela.Command.Trade do
   end
 
   defp create_base_coin(id, base, coins, command, user) do
-    case Trading.create_coin(%{symbol: base, base: true, session_id: id}) do
+    case Trading.create_coin(%{symbol: String.trim(base), base: true, session_id: id}) do
       {:ok, coin} -> create_coins(id, command, user, coins)
       error -> error
     end
   end
 
   defp create_coins(id, command, user, []), do: run_period(id, command, user)
+
   defp create_coins(id, command, user, [coin | coins]) do
-    Trading.create_coin(%{symbol: coin, session_id: id})
+    Trading.create_coin(%{symbol: String.trim(coin), session_id: id})
     create_coins(id, command, user, coins)
   end
 
-
   defp run_period(session_id, command, user) do
     {coins, trading_pairs} = formatted_coins(session_id)
+
     case Nadia.send_message(user.id, Messages.period(coins, trading_pairs)) do
       {:ok, _msg} -> create_command_message(command.update_id, "trade_period")
       error -> error
@@ -88,7 +113,7 @@ defmodule Pamela.Command.Trade do
   defp parse_period(command, message, user, session) do
     case Float.parse(message.text) do
       {_val, _rem} -> save_trading_period(session, command, message, user)
-      :error -> Nadia.send_message(user.id, "This is not a number. Please send a number in hours.")
+      :error -> {:error, :not_number}
     end
   end
 
@@ -101,7 +126,11 @@ defmodule Pamela.Command.Trade do
 
   defp run_confirmation(session, command, message, user, period) do
     {coins, trading_pairs} = formatted_coins(session.id)
-    case Nadia.send_message(user.id, Messages.confirm_session(coins, trading_pairs, period.period)) do
+
+    case Nadia.send_message(
+           user.id,
+           Messages.confirm_session(coins, trading_pairs, period.period)
+         ) do
       {:ok, _msg} -> create_command_message(command.update_id, "trade_confirmation")
       error -> error
     end
@@ -111,12 +140,12 @@ defmodule Pamela.Command.Trade do
     case String.downcase(message.text) do
       "yes" -> run_positive_confirmation(command, message, user)
       "no" -> run_negative_confirmation(command, message, user)
-      _ -> Nadia.send_message(user.id, "Please respond with yes or no")
+      _ -> {:error, :invalid_response}
     end
   end
 
   defp run_positive_confirmation(command, message, user) do
-    #TODO: This is where we shal initiate the action to trade
+    # TODO: This is where we shal initiate the action to trade
     case Pamela.Command.update_telegram_command(command, %{executed: true}) do
       {:ok, _cmd} -> Nadia.send_message(user.id, "Command #{command.command} executed!")
       error -> error
@@ -137,18 +166,22 @@ defmodule Pamela.Command.Trade do
 
   defp formatted_coins(session_id) do
     coins = Trading.get_coin_by(session_id)
-    IO.inspect coins
-    base = Enum.filter(coins, fn coin -> coin.base end)
+    base = Enum.find(coins, fn coin -> coin.base end)
     trading_coins = Enum.filter(coins, fn coin -> !coin.base end)
 
     symbols = Enum.map(coins, fn coin -> coin.symbol end)
-    trading_pairs = Enum.map(coins, fn coin ->
-      if !coin.base do
-        coin.symbol <> base.symbol
-      else
-        coin.symbol
-      end
-    end)
+
+    trading_pairs =
+      Enum.map(coins, fn coin ->
+        IO.inspect(coin)
+
+        if !coin.base do
+          "#{coin.symbol}#{base.symbol}"
+        else
+          coin.symbol
+        end
+      end)
+
     {symbols, trading_pairs}
   end
 end

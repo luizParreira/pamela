@@ -8,6 +8,7 @@ defmodule Pamela.Trading.Session do
     field :name, :string
     field :running, :boolean
     field :telegram_user_id, :integer
+    field :command_id, :integer
 
     timestamps()
   end
@@ -15,7 +16,7 @@ defmodule Pamela.Trading.Session do
   @doc false
   def changeset(%Session{} = session, attrs) do
     session
-    |> cast(attrs, [:name, :running, :telegram_user_id])
-    |> validate_required([:name, :running, :telegram_user_id])
+    |> cast(attrs, [:name, :running, :telegram_user_id, :command_id])
+    |> validate_required([:name, :running, :telegram_user_id, :command_id])
   end
 end
