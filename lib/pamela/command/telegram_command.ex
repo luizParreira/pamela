@@ -3,12 +3,12 @@ defmodule Pamela.Command.TelegramCommand do
   import Ecto.Changeset
   alias Pamela.Command.TelegramCommand
 
-  @primary_key {:update_id, :integer, []}
-  @derive {Phoenix.Param, key: :update_id}
+  @primary_key {:message_id, :integer, []}
+  @derive {Phoenix.Param, key: :message_id}
   schema "telegram_commands" do
-    field :command, :string
-    field :telegram_user_id, :integer
-    field :executed, :boolean
+    field(:command, :string)
+    field(:telegram_user_id, :integer)
+    field(:executed, :boolean)
 
     timestamps()
   end
@@ -16,7 +16,7 @@ defmodule Pamela.Command.TelegramCommand do
   @doc false
   def changeset(%TelegramCommand{} = telegram_command, attrs) do
     telegram_command
-    |> cast(attrs, [:update_id, :command, :telegram_user_id, :executed])
-    |> validate_required([:update_id, :command, :telegram_user_id, :executed])
+    |> cast(attrs, [:message_id, :command, :telegram_user_id, :executed])
+    |> validate_required([:message_id, :command, :telegram_user_id, :executed])
   end
 end

@@ -6,9 +6,11 @@ defmodule Pamela.Command.Trade do
 
   def run(command, message, user) do
     case Trading.get_session_by(user.id, true) do
-      [] -> run_cmd(command, message, user)
+      [] ->
+        run_cmd(command, message, user)
+
       [session] ->
-        if session.command_id != command.update_id do
+        if session.command_id != command.message_id do
           resolve_current_command(user, command, session)
         else
           run_cmd(command, message, user)
@@ -24,7 +26,7 @@ defmodule Pamela.Command.Trade do
   end
 
   defp run_cmd(command, message, user) do
-    case Command.get_telegram_command_message_by(command.update_id) do
+    case Command.get_telegram_command_message_by(command.message_id) do
       [] -> run_intro(command, message, user)
       [command_msg] -> run(command_msg.message, command, message, user)
       [command_msg | _commands] -> run(command_msg.message, command, message, user)
@@ -33,7 +35,7 @@ defmodule Pamela.Command.Trade do
 
   defp run_intro(command, message, user) do
     case Nadia.send_message(user.id, Messages.trade_intro()) do
-      {:ok, success} -> create_command_message(command.update_id, "trade_intro")
+      {:ok, success} -> create_command_message(command.message_id, "trade_intro")
       {:error, error} -> {:error, error}
     end
   end
@@ -50,7 +52,7 @@ defmodule Pamela.Command.Trade do
            name: message.text,
            telegram_user_id: user.id,
            running: true,
-           command_id: command.update_id
+           command_id: command.message_id
          }) do
       {:ok, sess} -> run_coins(command, user)
       error -> error
@@ -59,7 +61,7 @@ defmodule Pamela.Command.Trade do
 
   defp run_coins(command, user) do
     case Nadia.send_message(user.id, Messages.coins()) do
-      {:ok, _message} -> create_command_message(command.update_id, "trade_coins")
+      {:ok, _message} -> create_command_message(command.message_id, "trade_coins")
       result -> result
     end
   end
@@ -97,7 +99,7 @@ defmodule Pamela.Command.Trade do
     {coins, trading_pairs} = formatted_coins(session_id)
 
     case Nadia.send_message(user.id, Messages.period(coins, trading_pairs)) do
-      {:ok, _msg} -> create_command_message(command.update_id, "trade_period")
+      {:ok, _msg} -> create_command_message(command.message_id, "trade_period")
       error -> error
     end
   end
@@ -131,7 +133,7 @@ defmodule Pamela.Command.Trade do
            user.id,
            Messages.confirm_session(coins, trading_pairs, period.period)
          ) do
-      {:ok, _msg} -> create_command_message(command.update_id, "trade_confirmation")
+      {:ok, _msg} -> create_command_message(command.message_id, "trade_confirmation")
       error -> error
     end
   end

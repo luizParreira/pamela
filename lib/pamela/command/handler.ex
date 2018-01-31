@@ -4,18 +4,32 @@ defmodule Pamela.Command.Handler do
   alias Pamela.Command.TelegramCommand
   alias Pamela.Command
   alias Pamela.Command.Executor
+  alias Pamela.Telegram
 
   def handle(id, %Message{} = message, :command) do
     {:ok, %TelegramUser{} = user} = parse_user(message.from)
 
-    case Command.get_telegram_command(id) do
-      nil -> save_and_execute_cmd(id, message, user)
-      %TelegramCommand{} = _cmd -> {:ok, :handled_command}
-    end
+    {:ok, %Telegram.Message{} = msg} =
+      Pamela.Telegram.create_message(%{
+        user_id: user.id,
+        update_id: id,
+        text: message.text,
+        type: "command"
+      })
+
+    save_and_execute_cmd(id, message, user)
   end
 
   def handle(id, %Message{} = message, :message) do
     {:ok, %TelegramUser{} = user} = parse_user(message.from)
+
+    {:ok, %Telegram.Message{} = msg} =
+      Pamela.Telegram.create_message(%{
+        user_id: user.id,
+        update_id: id,
+        text: message.text,
+        type: "message"
+      })
 
     case Command.get_telegram_command_by(user.id, false) do
       [] -> {:error, :handled_command}
@@ -28,7 +42,7 @@ defmodule Pamela.Command.Handler do
 
   defp save_and_execute_cmd(id, message, user) do
     case Command.create_telegram_command(%{
-           update_id: id,
+           message_id: id,
            command: message.text,
            telegram_user_id: user.id,
            executed: false

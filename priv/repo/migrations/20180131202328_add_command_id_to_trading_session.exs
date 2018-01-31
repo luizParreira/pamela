@@ -3,7 +3,7 @@ defmodule Pamela.Repo.Migrations.AddCommandIdToTradingSession do
 
   def change do
     alter table(:trading_sessions) do
-      add :command_id, references(:telegram_commands, column: :update_id)
+      add(:command_id, references(:telegram_commands, column: :message_id))
     end
   end
 end

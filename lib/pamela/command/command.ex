@@ -42,7 +42,8 @@ defmodule Pamela.Command do
       from(
         c in TelegramCommand,
         where: c.telegram_user_id == ^telegram_user_id and c.executed == ^executed,
-        select: c
+        select: c,
+        order_by: [desc: c.inserted_at]
       )
     )
   end
@@ -142,7 +143,6 @@ defmodule Pamela.Command do
 
   """
   def get_telegram_command_message!(id), do: Repo.get!(TelegramCommandMessage, id)
-
 
   def get_telegram_command_message_by(telegram_command_update_id) do
     Repo.all(

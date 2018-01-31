@@ -13,9 +13,9 @@ defmodule Pamela.Application do
       # Start the endpoint when the application starts
       supervisor(PamelaWeb.Endpoint, []),
       # Start your own worker by calling: Pamela.Worker.start_link(arg1, arg2, arg3)
-			# worker(Pamela.Worker, [arg1, arg2, arg3]),
+      # worker(Pamela.Worker, [arg1, arg2, arg3]),
       worker(Pamela.PeriodicTask, [])
-		]
+    ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
