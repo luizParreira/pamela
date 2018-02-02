@@ -3,25 +3,12 @@ defmodule Pamela.Command.Trade do
   alias Pamela.Command.Messages
   alias Pamela.Telegram
   alias Pamela.Trading
+  alias Pamela.Trading.Trade.Init
 
   def run(command, message, user) do
-    case Trading.get_session_by(user.id, true) do
-      [] ->
-        run_cmd(command, message, user)
-
-      [session] ->
-        if session.command_id != command.message_id do
-          resolve_current_command(user, command, session)
-        else
-          run_cmd(command, message, user)
-        end
-    end
-  end
-
-  defp resolve_current_command(user, command, session) do
-    case Telegram.update_command(command, %{executed: true}) do
-      {:ok, _cmd} -> Nadia.send_message(user.id, Messages.existing_session(session))
-      _ -> {:error, :couldnt_update_command}
+    case Init.run(command, message, user) do
+      {:run, {command, message, user}} -> run_cmd(command, message, user)
+      _ -> _
     end
   end
 
@@ -167,23 +154,8 @@ defmodule Pamela.Command.Trade do
   end
 
   defp formatted_coins(session_id) do
-    coins = Trading.get_coin_by(session_id)
-    base = Enum.find(coins, fn coin -> coin.base end)
-    trading_coins = Enum.filter(coins, fn coin -> !coin.base end)
-
-    symbols = Enum.map(coins, fn coin -> coin.symbol end)
-
-    trading_pairs =
-      Enum.map(coins, fn coin ->
-        IO.inspect(coin)
-
-        if !coin.base do
-          "#{coin.symbol}#{base.symbol}"
-        else
-          coin.symbol
-        end
-      end)
-
-    {symbols, trading_pairs}
+    session_id
+    |> Trading.get_coins_by()
+    |> Trading.FormatCoins.format()
   end
 end

@@ -39,9 +39,11 @@ defmodule Pamela.Trading do
 
   def get_session_by(telegram_user_id, running) do
     Repo.all(
-      from s in Session,
-      where: s.telegram_user_id == ^telegram_user_id and s.running == ^running,
-      select: s
+      from(
+        s in Session,
+        where: s.telegram_user_id == ^telegram_user_id and s.running == ^running,
+        select: s
+      )
     )
   end
 
@@ -141,11 +143,13 @@ defmodule Pamela.Trading do
   """
   def get_coin!(id), do: Repo.get!(Coin, id)
 
-  def get_coin_by(session_id) do
+  def get_coins_by(session_id: session_id) do
     Repo.all(
-      from s in Coin,
-      where: s.session_id == ^session_id,
-      select: s
+      from(
+        s in Coin,
+        where: s.session_id == ^session_id,
+        select: s
+      )
     )
   end
 
