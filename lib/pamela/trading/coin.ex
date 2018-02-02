@@ -3,11 +3,10 @@ defmodule Pamela.Trading.Coin do
   import Ecto.Changeset
   alias Pamela.Trading.Coin
 
-
   schema "trading_coins" do
-    field :base, :boolean, default: false
-    field :session_id, :integer
-    field :symbol, :string
+    field(:base, :boolean, default: false)
+    field(:session_id, :integer)
+    field(:symbol, :string)
 
     timestamps()
   end
@@ -16,6 +15,7 @@ defmodule Pamela.Trading.Coin do
   def changeset(%Coin{} = coin, attrs) do
     coin
     |> cast(attrs, [:symbol, :session_id, :base])
+    |> foreign_key_constraint(:session_id)
     |> validate_required([:symbol, :session_id, :base])
   end
 end

@@ -1,7 +1,7 @@
 defmodule Pamela.Command.Handler do
   alias Nadia.Model.{User, Message}
   alias Pamela.User.TelegramUser
-  alias Pamela.Command.TelegramCommand
+  alias Pamela.Telegram.Command
   alias Pamela.Command
   alias Pamela.Command.Executor
   alias Pamela.Telegram
@@ -31,7 +31,7 @@ defmodule Pamela.Command.Handler do
         type: "message"
       })
 
-    case Command.get_telegram_command_by(user.id, false) do
+    case Telegram.get_command_by(user_id: user.id, executed: false) do
       [] -> {:error, :handled_command}
       [command] -> Executor.execute(command, message, user)
       [command | _commands] -> Executor.execute(command, message, user)
@@ -41,7 +41,7 @@ defmodule Pamela.Command.Handler do
   def handle(_id, _msg, _flag), do: {:error, :unknown_message}
 
   defp save_and_execute_cmd(id, message, user) do
-    case Command.create_telegram_command(%{
+    case Telegram.create_command(%{
            message_id: id,
            command: message.text,
            telegram_user_id: user.id,

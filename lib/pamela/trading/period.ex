@@ -3,10 +3,9 @@ defmodule Pamela.Trading.Period do
   import Ecto.Changeset
   alias Pamela.Trading.Period
 
-
   schema "trading_periods" do
-    field :period, :string
-    field :session_id, :integer
+    field(:period, :string)
+    field(:session_id, :integer)
 
     timestamps()
   end
@@ -15,6 +14,7 @@ defmodule Pamela.Trading.Period do
   def changeset(%Period{} = period, attrs) do
     period
     |> cast(attrs, [:period, :session_id])
+    |> foreign_key_constraint(:session_id)
     |> validate_required([:period, :session_id])
   end
 end

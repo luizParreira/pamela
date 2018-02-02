@@ -1,7 +1,7 @@
 defmodule Pamela.Command.Trade do
-  alias Pamela.Command.TelegramCommandMessage
+  alias Pamela.Telegram.CommandMessage
   alias Pamela.Command.Messages
-  alias Pamela.Command
+  alias Pamela.Telegram
   alias Pamela.Trading
 
   def run(command, message, user) do
@@ -19,7 +19,7 @@ defmodule Pamela.Command.Trade do
   end
 
   defp resolve_current_command(user, command, session) do
-    case Command.update_telegram_command(command, %{executed: true}) do
+    case Telegram.update_command(command, %{executed: true}) do
       {:ok, _cmd} -> Nadia.send_message(user.id, Messages.existing_session(session))
       _ -> {:error, :couldnt_update_command}
     end
@@ -41,7 +41,7 @@ defmodule Pamela.Command.Trade do
   end
 
   defp create_command_message(id, message) do
-    Command.create_telegram_command_message(%{
+    Telegram.create_command_message(%{
       telegram_command_update_id: id,
       message: message
     })
@@ -148,14 +148,14 @@ defmodule Pamela.Command.Trade do
 
   defp run_positive_confirmation(command, message, user) do
     # TODO: This is where we shal initiate the action to trade
-    case Pamela.Command.update_telegram_command(command, %{executed: true}) do
+    case Telegram.update_command(command, %{executed: true}) do
       {:ok, _cmd} -> Nadia.send_message(user.id, "Command #{command.command} executed!")
       error -> error
     end
   end
 
   defp run_negative_confirmation(command, message, user) do
-    case Pamela.Command.update_telegram_command(command, %{executed: true}) do
+    case Telegram.update_command(command, %{executed: true}) do
       {:ok, _cmd} -> update_session(user)
       error -> error
     end

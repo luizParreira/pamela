@@ -1,22 +1,20 @@
 defmodule Pamela.Command.Start do
   alias Pamela.User.TelegramUser
-  alias Pamela.Command.TelegramCommand
+  alias Pamela.Telegram.Command
+  alias Pamela.Telegram
+  alias Pamela.Command.Messsages
 
-  def run(%TelegramCommand{} = command, %TelegramUser{} = user) do
-    case Nadia.send_message(user.id, Pamela.Command.Messages.intro(user)) do
+  def run(%Command{} = command, %TelegramUser{} = user) do
+    case Nadia.send_message(user.id, Messages.intro(user)) do
       {:ok, message} -> update_command(command)
-      error -> error
+      error -> {:error, error}
     end
   end
 
-  def update_command(command) do
-    case Pamela.Command.update_telegram_command(command, %{executed: true}) do
-      {:ok, new_command} ->
-        IO.inspect new_command
-        command
-      {:error, error} ->
-        IO.inspect error
-        error
+  defp update_command(command) do
+    case Telegram.update_command(command, %{executed: true}) do
+      {:ok, command} -> command
+      {:error, error} -> error
     end
   end
 end

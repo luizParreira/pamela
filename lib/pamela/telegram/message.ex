@@ -17,6 +17,7 @@ defmodule Pamela.Telegram.Message do
   def changeset(%Message{} = message, attrs) do
     message
     |> cast(attrs, [:update_id, :text, :type, :user_id])
+    |> foreign_key_constraint(:user_id)
     |> validate_required([:update_id, :text, :type, :user_id])
   end
 end

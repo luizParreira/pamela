@@ -1,9 +1,9 @@
 defmodule Pamela.Command.Executor do
   alias Pamela.User.TelegramUser
-  alias Pamela.Command.TelegramCommand
+  alias Pamela.Telegram
   alias Pamela.Command
 
-  def execute(%TelegramCommand{} = command, message, %TelegramUser{} = user) do
+  def execute(%Telegram.Command{} = command, message, %TelegramUser{} = user) do
     execute_command(command.command, command, message, user)
   end
 
