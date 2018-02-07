@@ -17,6 +17,6 @@ defmodule Pamela.PeriodicTask do
   end
 
   defp schedule_work() do
-    Process.send_after(self(), :work,  10 * 1000) # In 1 minute
+    Process.send_after(self(), :work,  10 * 1000) # In 10 seconds
   end
 end
