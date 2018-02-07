@@ -153,6 +153,8 @@ defmodule Pamela.Trading do
     )
   end
 
+  def get_coins_by(session_id), do: get_coins_by(session_id: session_id)
+
   @doc """
   Creates a coin.
 

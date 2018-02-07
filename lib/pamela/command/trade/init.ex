@@ -7,15 +7,15 @@ defmodule Pamela.Command.Trade.Init do
   def run(command, message, user) do
     case Trading.get_session_by(user.id, true) do
       [] -> {:run, {command, message, user}}
-      [session] -> resolve_command(command, message, user)
+      [session] -> resolve_command(command, message, user, session)
     end
   end
 
-  def resolve_command(user, command, session) do
+  def resolve_command(command, message, user, session) do
     if session.command_id != command.message_id do
-      resolve_current_command(user, command, session)
+      resolve_existing_command(user, command, session)
     else
-      {:run, {command, message, user})
+      {:run, {command, message, user}}
     end
   end
 

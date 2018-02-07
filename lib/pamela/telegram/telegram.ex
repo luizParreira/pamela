@@ -285,6 +285,13 @@ defmodule Pamela.Telegram do
     )
   end
 
+  def create_command_message(id, message) do
+    create_command_message(%{
+      telegram_command_update_id: id,
+      message: message
+    })
+  end
+
   @doc """
   Creates a command_message.
 
