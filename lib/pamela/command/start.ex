@@ -2,7 +2,7 @@ defmodule Pamela.Command.Start do
   alias Pamela.User.TelegramUser
   alias Pamela.Telegram.Command
   alias Pamela.Telegram
-  alias Pamela.Command.Messsages
+  alias Pamela.Command.Messages
 
   def run(%Command{} = command, %TelegramUser{} = user) do
     case Nadia.send_message(user.id, Messages.intro(user)) do
