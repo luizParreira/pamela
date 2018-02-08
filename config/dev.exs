@@ -45,7 +45,7 @@ config :pamela, Pamela.Repo,
   hostname: "db",
   pool_size: 10
 
-config :nadia,
-  token: System.get_env("TELEGRAM_TOKEN")
+config :nadia, token: System.get_env("TELEGRAM_TOKEN")
 config :pamela, :bot_token, System.get_env("TELEGRAM_TOKEN")
 
+config :pamela, :allowed_user, System.get_env("ALLOWED_USER")
