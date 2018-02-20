@@ -6,16 +6,14 @@
 use Mix.Config
 
 # General application configuration
-config :pamela,
-  ecto_repos: [Pamela.Repo]
+config :pamela, ecto_repos: [Pamela.Repo]
 
 # Configures the endpoint
 config :pamela, PamelaWeb.Endpoint,
   url: [host: "dev"],
   secret_key_base: "XVurpsSlWBXqedTs+a4q9q94t9aFQKvRrM5ocecxguEyseaufyCDfnouUaRKDbYE",
   render_errors: [view: PamelaWeb.ErrorView, accepts: ~w(json)],
-  pubsub: [name: Pamela.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Pamela.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -24,4 +22,4 @@ config :logger, :console,
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"
