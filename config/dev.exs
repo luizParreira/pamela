@@ -49,3 +49,7 @@ config :nadia, token: System.get_env("TELEGRAM_TOKEN")
 config :pamela, :bot_token, System.get_env("TELEGRAM_TOKEN")
 
 config :pamela, :allowed_user, System.get_env("ALLOWED_USER")
+
+config :binance,
+  api_key: System.get_env("API_KEY"),
+  secret_key: System.get_env("SECRET_KEY")
