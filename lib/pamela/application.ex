@@ -6,20 +6,6 @@ defmodule Pamela.Application do
   def start(_type, _args) do
     import Supervisor.Spec
 
-    user_id = Application.get_env(:pamela, :allowed_user)
-
-    rebalance_data =
-      case Trading.get_session_by(user_id, true) do
-        session -> {session, Trading.get_period_by(session: session)}
-        _value -> {nil, nil}
-      end
-
-    args =
-      case rebalance_data do
-        {nil, nil} -> []
-        {session, period} -> [session, period]
-      end
-
     # Define workers and child supervisors to be supervised
     children = [
       # Start the Ecto repository
@@ -29,7 +15,8 @@ defmodule Pamela.Application do
       # Start your own worker by calling: Pamela.Worker.start_link(arg1, arg2, arg3)
       # worker(Pamela.Worker, [arg1, arg2, arg3]),
       worker(Pamela.PeriodicTask, []),
-      worker(Pamela.Trader.Rebalance, args)
+      # worker(Pamela.Trader.RebalanceTask, args)
+      worker(Pamela.Trader.RebalanceTask, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

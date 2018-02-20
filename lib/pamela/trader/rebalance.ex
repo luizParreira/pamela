@@ -1,40 +1,26 @@
-defmodule Pamela.PeriodicTask do
-  use GenServer
+defmodule Pamela.Trader.Rebalance do
+  alias Pamela.Trading.Session
+  alias Pamela.Trader.Allocation
+  alias Pamela.BinanceEx
+  alias Pamela.PAMR
+  alias Pamela.Trading
 
-  def start_link do
-    GenServer.start_link(__MODULE__, [])
+  def rebalance(%Session{} = session) do
+    {balances, prices} =
+      case Trading.get_coins_by(session_id: session.id) do
+        coins ->
+          {Exchange.get_balance(%BinanceEx{}, coins), Exchange.get_prices(%BinanceEx{}, coins)}
+
+        nil ->
+          {:error, "No coins registered to session #{session.id}"}
+      end
+
+    {total, allocation} = Allocation.current(balances, prices)
+
+    target = PAMR.run(0.7, 0.3, prices, prices, allocation)
+
+    IO.puts(target)
   end
 
-  def init(state) do
-    # Schedule work to be performed at some point
-    schedule_work(state)
-    {:ok, state}
-  end
-
-  def handle_info(:work, []) do
-    {:noreply, []}
-  end
-
-  def handle_info(:work, [%Trading.Session{} = session]) do
-    Trader.rebalance(session)
-    # Reschedule once more
-    schedule_work([session])
-    {:noreply, [session]}
-  end
-
-  defp schedule_work([session, period]) do
-    # In 10 seconds
-    case Float.parse(period.period) do
-      {val, _rem} -> sned_after(val)
-      :error -> :error
-    end
-  end
-
-  defp sned_after(time) do
-    Process.send_after(self(), :work, time * 60 * 60 * 1000)
-  end
-
-  defp schedule_work(_state) do
-    :do_noting
-  end
+  def rebalance(other_session), do: {:error, "Unknown struct #{other_session}"}
 end

@@ -47,14 +47,8 @@ defmodule Pamela.Trading do
     )
   end
 
-  def get_period(session: session) do
-    Repo.get(
-      from(
-        p in Period,
-        where: p.session_id = session.id,
-        select: s.period
-      )
-    )
+  def get_period_by(session: session) do
+    Repo.get_by(Period, session_id: session.id)
   end
 
   @doc """
