@@ -4,13 +4,9 @@ defmodule Pamela.Trader.RebalanceTask do
   alias Pamela.Trader
 
   def start_link do
-    GenServer.start_link(__MODULE__, [])
-  end
-
-  def init(state) do
-    # Schedule work to be performed at some point
-
     user_id = Application.get_env(:pamela, :allowed_user)
+
+    IO.puts("UserID: #{user_id}")
 
     args =
       case Trading.get_session_by(user_id, true) do
@@ -18,14 +14,20 @@ defmodule Pamela.Trader.RebalanceTask do
         _value -> []
       end
 
-    IO.puts("Initializing rebalacing task")
-
-    schedule_work(args)
-    {:ok, args}
+    GenServer.start_link(__MODULE__, args)
   end
 
-  def handle_info(:work, []) do
+  def init([session, period]) do
+    # Schedule work to be performed at some point
+    IO.inspect([session, period])
+    IO.puts("Initializing rebalancing task")
     schedule_work([])
+    {:ok, [session, period]}
+  end
+
+  def init(other), do: IO.inspect(other)
+
+  def handle_info(:work, []) do
     {:noreply, []}
   end
 
@@ -48,9 +50,7 @@ defmodule Pamela.Trader.RebalanceTask do
   end
 
   defp schedule_work([]) do
-    0.1
-    |> fetch_time
-    |> send_after(:work)
+    send_after(0, :work)
   end
 
   defp send_after(time, work) do

@@ -20,6 +20,8 @@ defmodule Pamela.Command.Trade.Confirmation do
   end
 
   def handle(command, message, user) do
+    IO.inspect(message)
+
     case String.downcase(message.text) do
       "yes" -> run_positive_confirmation(command, user)
       "no" -> run_negative_confirmation(command, user)
@@ -29,9 +31,14 @@ defmodule Pamela.Command.Trade.Confirmation do
 
   defp run_positive_confirmation(command, user) do
     # TODO: This is where we shal initiate the action to trade
+    IO.puts("Confirming trades")
+
     case Telegram.update_command(command, %{executed: true}) do
-      {:ok, _cmd} -> Nadia.send_message(user.id, "Command #{command.command} executed!")
-      error -> error
+      {:ok, _cmd} ->
+        Pamela.Trader.RebalanceTask.start_link()
+
+      error ->
+        error
     end
   end
 

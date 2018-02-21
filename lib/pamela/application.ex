@@ -11,12 +11,11 @@ defmodule Pamela.Application do
       # Start the Ecto repository
       supervisor(Pamela.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(PamelaWeb.Endpoint, []),
+      supervisor(PamelaWeb.Endpoint, [])
       # Start your own worker by calling: Pamela.Worker.start_link(arg1, arg2, arg3)
       # worker(Pamela.Worker, [arg1, arg2, arg3]),
-      worker(Pamela.PeriodicTask, []),
+      # worker(Pamela.PeriodicTask, [])
       # worker(Pamela.Trader.RebalanceTask, args)
-      worker(Pamela.Trader.RebalanceTask, [])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

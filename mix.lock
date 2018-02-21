@@ -1,5 +1,5 @@
 %{
-  "binance": {:git, "https://github.com/luizParreira/binance.ex.git", "b1ee0e544ce51563d5c34fa659086ace8917dce3", [branch: "implement-balances"]},
+  "binance": {:git, "https://github.com/luizParreira/binance.ex.git", "d9d7339e18f337b890f23d8145af9454c0e1f42d", [branch: "implement-balances"]},
   "certifi": {:hex, :certifi, "2.0.0", "a0c0e475107135f76b8c1d5bc7efb33cd3815cb3cf3dea7aefdd174dabead064", [:rebar3], [], "hexpm"},
   "connection": {:hex, :connection, "1.0.4", "a1cae72211f0eef17705aaededacac3eb30e6625b04a6117c1b2db6ace7d5976", [:mix], [], "hexpm"},
   "cors_plug": {:hex, :cors_plug, "1.5.0", "6311ea6ac9fb78b987df52a7654136626a7a0c3b77f83da265f952a24f2fc1b0", [:mix], [{:plug, "~> 1.4", [hex: :plug, repo: "hexpm", optional: false]}], "hexpm"},

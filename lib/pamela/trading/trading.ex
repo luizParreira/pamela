@@ -47,10 +47,6 @@ defmodule Pamela.Trading do
     )
   end
 
-  def get_period_by(session: session) do
-    Repo.get_by(Period, session_id: session.id)
-  end
-
   @doc """
   Creates a session.
 
@@ -254,6 +250,10 @@ defmodule Pamela.Trading do
 
   """
   def get_period(id), do: Repo.get(Period, id)
+
+  def get_period_by(session: session) do
+    Repo.get_by(Period, session_id: session.id)
+  end
 
   @doc """
   Creates a period.

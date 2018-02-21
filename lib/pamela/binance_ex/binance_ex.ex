@@ -1,38 +1,5 @@
 defmodule Pamela.BinanceEx do
   defstruct []
-
-  def get_balances([], _coins), do: []
-  def get_balances(_balances, coins: []), do: []
-
-  def get_balances(balances, coins: coins) do
-    Enum.map(coins, fn coin ->
-      {balance, rem} =
-        balances
-        |> Enum.find(fn balance -> balance.asset === coin end)
-        |> Float.parse()
-
-      {coin, balance}
-    end)
-  end
-
-  def get_prices([], _coins), do: []
-  def get_prices(_prices, coins: []), do: []
-
-  def get_prices(prices, coins: coins) do
-    base = Enum.find(coins, fn c -> c.base end)
-
-    Enum.map(coins, fn coin ->
-      {price, _rem} =
-        if coin.base do
-          {1.0, ""}
-        else
-          Enum.find(prices, fn price -> price.symbol === coin.symbol <> base.symbol end)
-          |> Float.parse()
-        end
-
-      {coin, price}
-    end)
-  end
 end
 
 defimpl Exchange, for: Pamela.BinanceEx do
@@ -45,7 +12,7 @@ defimpl Exchange, for: Pamela.BinanceEx do
         |> Enum.map(fn %{"asset" => asset, "free" => free, "locked" => locked} ->
           %Balance{asset: asset, free: free, locked: locked}
         end)
-        |> self.get_balances(coins: coins)
+        |> get_balances_for(coins: coins)
 
       error ->
         error
@@ -54,8 +21,39 @@ defimpl Exchange, for: Pamela.BinanceEx do
 
   def get_prices(self, coins) do
     case Binance.get_all_prices() do
-      {:ok, prices} -> self.get_prices(prices, coins: coins)
+      {:ok, prices} -> get_prices_for(prices, coins: coins)
       error -> error
     end
+  end
+
+  defp get_balances_for([], _coins), do: []
+  defp get_balances_for(_balances, coins: []), do: []
+
+  defp get_balances_for(balances, coins: coins) do
+    Enum.map(coins, fn coin ->
+      balance = Enum.find(balances, fn balance -> balance.asset === coin.symbol end)
+      {val, _rem} = Float.parse(balance.free)
+
+      {coin.symbol, val}
+    end)
+  end
+
+  defp get_prices_for([], _coins), do: []
+  defp get_prices_for(_prices, coins: []), do: []
+
+  defp get_prices_for(prices, coins: coins) do
+    base = Enum.find(coins, fn c -> c.base end)
+
+    Enum.map(coins, fn coin ->
+      {price, _rem} =
+        if coin.base do
+          {1.0, ""}
+        else
+          price = Enum.find(prices, fn price -> price.symbol === coin.symbol <> base.symbol end)
+          Float.parse(price.price)
+        end
+
+      {coin.symbol, price}
+    end)
   end
 end
