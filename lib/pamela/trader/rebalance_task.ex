@@ -19,11 +19,11 @@ defmodule Pamela.Trader.RebalanceTask do
 
   def init([session, period]) do
     # Schedule work to be performed at some point
-    IO.inspect([session, period])
-    IO.puts("Initializing rebalancing task")
     schedule_work([])
-    {:ok, [session, period]}
+    {:ok, {[session, period], []}}
   end
+
+  def init([]), do: {:noreply}
 
   def init(other), do: IO.inspect(other)
 
@@ -31,11 +31,14 @@ defmodule Pamela.Trader.RebalanceTask do
     {:noreply, []}
   end
 
-  def handle_info(:work, [%Trading.Session{} = session, %Trading.Period{} = period]) do
-    Trader.rebalance(session)
+  def handle_info(
+        :work,
+        {[%Trading.Session{} = session, %Trading.Period{} = period], prev_prices}
+      ) do
+    {:ok, prices} = Trader.rebalance(session, prev_prices)
     # Reschedule once more
     schedule_work([session, period])
-    {:noreply, [session, period]}
+    {:noreply, {[session, period], prices}}
   end
 
   defp schedule_work([session, period]) do
@@ -57,11 +60,7 @@ defmodule Pamela.Trader.RebalanceTask do
     Process.send_after(self(), work, time)
   end
 
-  defp fetch_time(val) when val >= 1.0 do
+  defp fetch_time(val) do
     Kernel.trunc(val * 60 * 60 * 1000)
-  end
-
-  defp fetch_time(val) when val < 1.0 do
-    Kernel.trunc(val * 60 * 1000)
   end
 end

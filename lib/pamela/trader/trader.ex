@@ -1,3 +1,3 @@
 defmodule Pamela.Trader do
-  defdelegate rebalance(session), to: Pamela.Trader.Rebalance
+  defdelegate rebalance(session, prev_prices), to: Pamela.Trader.Rebalance
 end
