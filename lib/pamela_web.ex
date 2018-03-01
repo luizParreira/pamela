@@ -17,41 +17,11 @@ defmodule PamelaWeb do
   and import those modules here.
   """
 
-  def controller do
-    quote do
-      use Phoenix.Controller, namespace: PamelaWeb
-      import Plug.Conn
-      import PamelaWeb.Router.Helpers
-      import PamelaWeb.Gettext
-    end
-  end
-
-  def view do
-    quote do
-      use Phoenix.View, root: "lib/pamela_web/templates",
-                        namespace: PamelaWeb
-
-      # Import convenience functions from controllers
-      import Phoenix.Controller, only: [get_flash: 2, view_module: 1]
-
-      import PamelaWeb.Router.Helpers
-      import PamelaWeb.ErrorHelpers
-      import PamelaWeb.Gettext
-    end
-  end
-
   def router do
     quote do
       use Phoenix.Router
       import Plug.Conn
       import Phoenix.Controller
-    end
-  end
-
-  def channel do
-    quote do
-      use Phoenix.Channel
-      import PamelaWeb.Gettext
     end
   end
 
