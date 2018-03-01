@@ -15,6 +15,7 @@ defmodule Pamela.Application do
       # Start your own worker by calling: Pamela.Worker.start_link(arg1, arg2, arg3)
       # worker(Pamela.Worker, [arg1, arg2, arg3]),
       worker(Pamela.PeriodicTask, [])
+      # worker(Pamela.Trader.RebalanceTask, args)
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

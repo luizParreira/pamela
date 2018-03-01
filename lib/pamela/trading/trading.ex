@@ -238,18 +238,22 @@ defmodule Pamela.Trading do
   @doc """
   Gets a single period.
 
-  Raises `Ecto.NoResultsError` if the Period does not exist.
+  Raises `nil` if the Period does not exist.
 
   ## Examples
 
-      iex> get_period!(123)
+      iex> get_period(123)
       %Period{}
 
-      iex> get_period!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_period(456)
+      ** nil
 
   """
-  def get_period!(id), do: Repo.get!(Period, id)
+  def get_period(id), do: Repo.get(Period, id)
+
+  def get_period_by(session: session) do
+    Repo.get_by(Period, session_id: session.id)
+  end
 
   @doc """
   Creates a period.

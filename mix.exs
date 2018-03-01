@@ -20,7 +20,7 @@ defmodule Pamela.Mixfile do
   def application do
     [
       mod: {Pamela.Application, []},
-      extra_applications: [:nadia, :logger, :runtime_tools]
+      extra_applications: [:nadia, :logger, :runtime_tools, :binance]
     ]
   end
 
@@ -39,7 +39,9 @@ defmodule Pamela.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
-      {:nadia, "~> 0.4.2"}
+      {:nadia, "~> 0.4.2"},
+      {:binance,
+       git: "https://github.com/luizParreira/binance.ex.git", branch: "implement-balances"}
     ]
   end
 

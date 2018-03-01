@@ -7,7 +7,7 @@ defmodule Pamela.Command.Halt do
     case Trading.get_session_by(user.id, true) do
       nil -> Nadia.send_message(user.id, Messages.no_session())
       [session] -> resolve_state(command, session, user)
-      _ -> {:error, :more_than_one_session_alive}
+      [session | sessions] -> resolve_state(command, session, user)
     end
   end
 
