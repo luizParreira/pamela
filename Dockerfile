@@ -11,6 +11,8 @@ WORKDIR /app
 
 RUN mix deps.get
 
+RUN echo "America/Sao_Paulo" > /etc/timezone
+
 EXPOSE 4000
 
 CMD ["mix", "phx.server"]
