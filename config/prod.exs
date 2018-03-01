@@ -15,7 +15,7 @@ use Mix.Config
 # which you typically run after static files are built.
 config :pamela, PamelaWeb.Endpoint,
   load_from_system_env: true,
-  url: [scheme: "https", host: "pamela-bot.herokuapp.com", port: 443],
+  url: [scheme: "https", host: "pamela-bot.herokuapp.com", port: System.get_env("PORT") || 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
