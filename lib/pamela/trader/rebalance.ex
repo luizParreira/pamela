@@ -29,7 +29,7 @@ defmodule Pamela.Trader.Rebalance do
 
     prev_prices = fetch_prices(previous_prices, prices)
 
-    target = PAMR.run(0.7, 0.9, prices, prev_prices, allocation)
+    target = PAMR.run(0.8, 0.9, prices, prev_prices, allocation)
 
     margin = 0.005
 
