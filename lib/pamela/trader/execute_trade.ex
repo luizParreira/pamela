@@ -19,7 +19,9 @@ defmodule Pamela.Trader.ExecuteTrade do
     trunc(amount)
   end
 
-  def trunc_amount(amount) when amount < 1 do
+  def trunc_amount(amount) when amount < 1 and amount >= 0 do
     amount
   end
+
+  def trunc_amount(amount), do: trunc(amount)
 end
