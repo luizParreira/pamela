@@ -28,14 +28,14 @@ defmodule Pamela.Trading do
 
   ## Examples
 
-      iex> get_session!(123)
+      iex> get_session(123)
       %Session{}
 
-      iex> get_session!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_session(456)
+      nil
 
   """
-  def get_session!(id), do: Repo.get!(Session, id)
+  def get_session(id), do: Repo.get(Session, id)
 
   def get_session_by(telegram_user_id, running) do
     Repo.all(
