@@ -33,13 +33,16 @@ defmodule Pamela.Trader.RebalanceTask do
 
   def handle_info(
         :work,
-        {[%Trading.Session{} = session, %Trading.Period{} = period], prev_prices}
+        {[%Trading.Session{running: true, id: _id} = session, %Trading.Period{} = period],
+         prev_prices}
       ) do
     {:ok, prices} = Trader.rebalance(session, prev_prices)
     # Reschedule once more
     schedule_work([session, period])
     {:noreply, {[session, period], prices}}
   end
+
+  def handle_info(:wor, _state), do: {:noreply, []}
 
   defp schedule_work([session, period]) do
     case Float.parse(period.period) do
