@@ -27,7 +27,7 @@ defmodule Pamela.Command.Handler do
       Pamela.Telegram.create_message(%{
         user_id: user.id,
         update_id: id,
-        text: message.text,
+        text: message.text || "empty_text",
         type: "message"
       })
 
@@ -37,6 +37,8 @@ defmodule Pamela.Command.Handler do
       [command | _commands] -> Executor.execute(command, message, user)
     end
   end
+
+  def handle(nil, _message, msg), do: {:error, :unknown_message}
 
   def handle(_id, _msg, _flag), do: {:error, :unknown_message}
 

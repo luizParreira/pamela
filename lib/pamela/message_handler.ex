@@ -42,4 +42,6 @@ defmodule Pamela.MessageHandler do
       end
     end)
   end
+
+  defp parse_command(_message, _entities, _id), do: {:error, :unhandled}
 end
