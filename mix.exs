@@ -20,7 +20,7 @@ defmodule Pamela.Mixfile do
   def application do
     [
       mod: {Pamela.Application, []},
-      extra_applications: [:nadia, :logger, :runtime_tools, :binance]
+      extra_applications: [:nadia, :logger, :runtime_tools, :binance, :timex]
     ]
   end
 
@@ -39,6 +39,7 @@ defmodule Pamela.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
+      {:timex, "~> 3.1"},
       {:nadia,
        git: "https://github.com/luizParreira/nadia.git",
        branch: "nadia/fix-poison-unexpected-response"},
