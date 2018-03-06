@@ -1,5 +1,25 @@
 defmodule Pamela.PAMR do
+  def run(insensitivity, aggressiveness, prices, [], allocation) do
+    run(insensitivity, aggressiveness, prices, prices, allocation)
+  end
+
   def run(insensitivity, aggressiveness, prices, previous_prices, allocation) do
+    IO.puts("Even before")
+    IO.inspect(previous_prices)
+
+    previous_prices =
+      Enum.map(previous_prices, fn {coin, p} ->
+        case Float.parse("#{p}") do
+          {val, _rem} -> {coin, val}
+          _rest -> nil
+        end
+      end)
+
+    IO.puts("Prices")
+    IO.inspect(prices)
+    IO.puts("Previous")
+    IO.inspect(previous_prices)
+
     returns =
       prices
       |> Enum.map(fn {coin, price} ->
