@@ -6,6 +6,9 @@ defmodule Pamela.Application do
   def start(_type, _args) do
     import Supervisor.Spec
 
+    message_handler = fn -> Pamela.MessageHandler.handle() end
+    rebalance_handler = fn -> Pamela.Trader.rebalance() end
+
     # Define workers and child supervisors to be supervised
     children = [
       # Start the Ecto repository
@@ -14,7 +17,8 @@ defmodule Pamela.Application do
       supervisor(PamelaWeb.Endpoint, []),
       # Start your own worker by calling: Pamela.Worker.start_link(arg1, arg2, arg3)
       # worker(Pamela.Worker, [arg1, arg2, arg3]),
-      worker(Pamela.PeriodicTask, [])
+      worker(Pamela.PeriodicTask, [%{task: message_handler}], id: :message_handler),
+      worker(Pamela.PeriodicTask, [%{task: rebalance_handler}], id: :rebalance_handler)
       # worker(Pamela.Trader.RebalanceTask, args)
     ]
 
