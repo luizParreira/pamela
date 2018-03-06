@@ -1,22 +1,25 @@
 defmodule Pamela.PeriodicTask do
   use GenServer
 
-  def start_link do
-    GenServer.start_link(__MODULE__, %{})
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state)
   end
 
   def init(state) do
-    schedule_work() # Schedule work to be performed at some point
+    # Schedule work to be performed at some point
+    schedule_work()
     {:ok, state}
   end
 
-  def handle_info(:work, state) do
-    Pamela.MessageHandler.handle
-    schedule_work() # Reschedule once more
+  def handle_info(:work, %{task: task} = state) do
+    task.()
+    # Reschedule once more
+    schedule_work()
     {:noreply, state}
   end
 
   defp schedule_work() do
-    Process.send_after(self(), :work,  10 * 1000) # In 10 seconds
+    # In 10 seconds
+    Process.send_after(self(), :work, 10 * 1000)
   end
 end
