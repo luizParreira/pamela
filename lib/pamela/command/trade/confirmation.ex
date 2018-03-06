@@ -34,8 +34,8 @@ defmodule Pamela.Command.Trade.Confirmation do
     IO.puts("Confirming trades")
 
     case Telegram.update_command(command, %{executed: true}) do
-      {:ok, _cmd} ->
-        Pamela.Trader.RebalanceTask.start_link()
+      {:ok, cmd} ->
+        Pamela.Trader.rebalance()
 
       error ->
         error
