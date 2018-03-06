@@ -319,4 +319,240 @@ defmodule Pamela.Trading do
   def change_period(%Period{} = period) do
     Period.changeset(period, %{})
   end
+
+  alias Pamela.Trading.Trade
+
+  @doc """
+  Returns the list of trading_trades.
+
+  ## Examples
+
+      iex> list_trading_trades()
+      [%Trade{}, ...]
+
+  """
+  def list_trading_trades do
+    Repo.all(Trade)
+  end
+
+  @doc """
+  Gets a single trade.
+
+  Raises `Ecto.NoResultsError` if the Trade does not exist.
+
+  ## Examples
+
+      iex> get_trade!(123)
+      %Trade{}
+
+      iex> get_trade!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_trade!(id), do: Repo.get!(Trade, id)
+
+  @doc """
+  Creates a trade.
+
+  ## Examples
+
+      iex> create_trade(%{field: value})
+      {:ok, %Trade{}}
+
+      iex> create_trade(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_trade(attrs \\ %{}) do
+    %Trade{}
+    |> Trade.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a trade.
+
+  ## Examples
+
+      iex> update_trade(trade, %{field: new_value})
+      {:ok, %Trade{}}
+
+      iex> update_trade(trade, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_trade(%Trade{} = trade, attrs) do
+    trade
+    |> Trade.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a Trade.
+
+  ## Examples
+
+      iex> delete_trade(trade)
+      {:ok, %Trade{}}
+
+      iex> delete_trade(trade)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_trade(%Trade{} = trade) do
+    Repo.delete(trade)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking trade changes.
+
+  ## Examples
+
+      iex> change_trade(trade)
+      %Ecto.Changeset{source: %Trade{}}
+
+  """
+  def change_trade(%Trade{} = trade) do
+    Trade.changeset(trade, %{})
+  end
+
+  alias Pamela.Trading.RebalanceTransaction
+
+  @doc """
+  Returns the list of trading_rebalance_transactions.
+
+  ## Examples
+
+      iex> list_trading_rebalance_transactions()
+      [%RebalanceTransaction{}, ...]
+
+  """
+  def list_trading_rebalance_transactions do
+    Repo.all(RebalanceTransaction)
+  end
+
+  @doc """
+  Gets a single rebalance_transaction.
+
+  Raises `Ecto.NoResultsError` if the Rebalance transaction does not exist.
+
+  ## Examples
+
+      iex> get_rebalance_transaction!(123)
+      %RebalanceTransaction{}
+
+      iex> get_rebalance_transaction!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_rebalance_transaction!(id), do: Repo.get!(RebalanceTransaction, id)
+
+  def find_or_create_transaction(%Session{id: id}) do
+    transaction =
+      Repo.all(
+        from(
+          trade in RebalanceTransaction,
+          where: trade.session_id == ^id,
+          order_by: trade.time,
+          select: trade,
+          limit: 1
+        )
+      )
+
+    resolve_transaction(transaction, id)
+  end
+
+  defp resolve_transaction([], id) do
+    attrs = %{session_id: id, time: DateTime.utc_now()}
+    create_rebalance_transaction(attrs)
+  end
+
+  defp resolve_transaction([transaction], _id) do
+    {:ok, transaction}
+  end
+
+  @doc """
+  Creates a rebalance_transaction.
+
+  ## Examples
+
+      iex> create_rebalance_transaction(%{field: value})
+      {:ok, %RebalanceTransaction{}}
+
+      iex> create_rebalance_transaction(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_rebalance_transaction(attrs \\ %{}) do
+    %RebalanceTransaction{}
+    |> RebalanceTransaction.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a rebalance_transaction.
+
+  ## Examples
+
+      iex> update_rebalance_transaction(rebalance_transaction, %{field: new_value})
+      {:ok, %RebalanceTransaction{}}
+
+      iex> update_rebalance_transaction(rebalance_transaction, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_rebalance_transaction(%RebalanceTransaction{} = rebalance_transaction, attrs) do
+    rebalance_transaction
+    |> RebalanceTransaction.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a RebalanceTransaction.
+
+  ## Examples
+
+      iex> delete_rebalance_transaction(rebalance_transaction)
+      {:ok, %RebalanceTransaction{}}
+
+      iex> delete_rebalance_transaction(rebalance_transaction)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_rebalance_transaction(%RebalanceTransaction{} = rebalance_transaction) do
+    Repo.delete(rebalance_transaction)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking rebalance_transaction changes.
+
+  ## Examples
+
+      iex> change_rebalance_transaction(rebalance_transaction)
+      %Ecto.Changeset{source: %RebalanceTransaction{}}
+
+  """
+  def change_rebalance_transaction(%RebalanceTransaction{} = rebalance_transaction) do
+    RebalanceTransaction.changeset(rebalance_transaction, %{})
+  end
+
+  def fetch_previous_prices(id, coins) do
+    coins = Enum.map(coins, fn c -> c.symbol end)
+
+    prices =
+      Repo.all(
+        from(
+          t in Trade,
+          where: t.rebalance_transaction_id == ^id and t.coin in ^coins,
+          select: {t.coin, t.price},
+          order_by: t.time,
+          limit: ^(Enum.count(coins) - 1)
+        )
+      )
+
+    case prices do
+      [] -> {:ok, []}
+      prices -> {:ok, [{"BTC", 1.0} | prices]}
+    end
+  end
 end
