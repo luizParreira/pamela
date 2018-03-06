@@ -40,9 +40,7 @@ defmodule Pamela.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:timex, "~> 3.1"},
-      {:nadia,
-       git: "https://github.com/luizParreira/nadia.git",
-       branch: "nadia/fix-poison-unexpected-response"},
+      {:nadia, "~> 0.4.2"},
       {:binance,
        git: "https://github.com/luizParreira/binance.ex.git", branch: "implement-balances"}
     ]
