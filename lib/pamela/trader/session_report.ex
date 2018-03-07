@@ -19,7 +19,7 @@ defmodule Pamela.Trader.SessionReport do
 
   defp format_coins(coins) do
     coins
-    |> Enum.map(fn {coin, balance} -> "#{coin} - #{balance}\n" end)
+    |> Enum.map(fn {coin, balance} -> "#{coin} 💰  #{balance}\n" end)
     |> Enum.join()
   end
 end

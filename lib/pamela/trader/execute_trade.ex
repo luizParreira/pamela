@@ -1,14 +1,17 @@
 defmodule Pamela.Trader.ExecuteTrade do
   def execute(trades, base, session, prices, transaction) do
-    Enum.map(trades, fn {coin, amount} ->
-      amount_trunc = trunc_amount(amount)
-      market = "#{coin}#{base.symbol}"
+    trades =
+      Enum.map(trades, fn {coin, amount} ->
+        amount_trunc = trunc_amount(amount)
+        market = "#{coin}#{base.symbol}"
 
-      case exec(amount_trunc, market) do
-        {:ok, trade} -> save_trades(trade, coin, session, prices, transaction, base)
-        {:error, error} -> save_trades(%{}, coin, session, prices, transaction, base)
-      end
-    end)
+        case exec(amount_trunc, market) do
+          {:ok, trade} -> save_trades(trade, coin, session, prices, transaction, base)
+          {:error, error} -> save_trades(%{}, coin, session, prices, transaction, base)
+        end
+      end)
+
+    {:ok, trades}
   end
 
   defp exec(amount, market) when amount > 0 do
@@ -26,7 +29,7 @@ defmodule Pamela.Trader.ExecuteTrade do
       amount: trade["executedQty"],
       base: base.symbol,
       coin: coin,
-      price: "#{price}",
+      price: Float.to_string(price),
       rebalance_transaction_id: transaction.id,
       side: trade["side"],
       order_id: trade["orderId"],
