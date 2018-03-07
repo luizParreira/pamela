@@ -7,8 +7,6 @@ defmodule Pamela.Trading.FormatCoins do
 
     trading_pairs =
       Enum.map(coins, fn coin ->
-        IO.inspect(coin)
-
         if !coin.base do
           "#{coin.symbol}#{base.symbol}"
         else
