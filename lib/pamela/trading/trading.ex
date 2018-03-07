@@ -447,27 +447,21 @@ defmodule Pamela.Trading do
   """
   def get_rebalance_transaction!(id), do: Repo.get!(RebalanceTransaction, id)
 
-  def find_or_create_transaction(%Session{id: id}) do
+  def fetch_latest_transaction(%Session{id: id}) do
     transaction =
-      Repo.all(
-        from(
-          trade in RebalanceTransaction,
-          where: trade.session_id == ^id,
-          order_by: trade.time,
-          select: trade,
-          limit: 1
-        )
+      Repo.one(
+        from(transaction in RebalanceTransaction, order_by: [desc: transaction.time], limit: 1)
       )
 
-    resolve_transaction(transaction, id)
+    {:ok, transaction}
   end
 
-  defp resolve_transaction([], id) do
+  defp resolve_transaction(nil, id) do
     attrs = %{session_id: id, time: DateTime.utc_now()}
     create_rebalance_transaction(attrs)
   end
 
-  defp resolve_transaction([transaction], _id) do
+  defp resolve_transaction(transaction, _id) do
     {:ok, transaction}
   end
 
@@ -549,6 +543,20 @@ defmodule Pamela.Trading do
           limit: ^(Enum.count(coins) - 1)
         )
       )
+
+    prices =
+      case prices do
+        [] ->
+          []
+
+        prices ->
+          Enum.map(prices, fn {coin, price} ->
+            case Float.parse(price) do
+              :error -> nil
+              {val, _rem} -> {coin, val}
+            end
+          end)
+      end
 
     case prices do
       [] -> {:ok, []}

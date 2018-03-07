@@ -13,20 +13,24 @@ defmodule Pamela.Trader.Rebalance do
 
   def rebalance do
     with {session, period} <- fetch_session_info(),
-         {:ok, %RebalanceTransaction{} = transaction} <-
-           Trading.find_or_create_transaction(session),
-         {:ok, transaction} <- continue_with_rebalance(transaction, period),
-         {balances, prices, coins} <- fetch_market_info(session),
+         {:ok, transaction} <- Trading.fetch_latest_transaction(session),
+         {:ok, %RebalanceTransaction{} = latest_transaction} <-
+           Trading.create_rebalance_transaction(%{
+             session_id: session.id,
+             time: DateTime.utc_now()
+           }),
+         {:ok, %RebalanceTransaction{} = _transaction} <-
+           continue_with_rebalance(transaction, period),
+         {:ok, coins} <- fetch_session_coins(session),
+         {balances, prices} <- fetch_market_info(coins),
          {total, allocation} <- Allocation.current(balances, prices),
-         {:ok, previous_prices} <- Trading.fetch_previous_prices(transaction.id, coins),
+         {:ok, previous_prices} <- Trading.fetch_previous_prices(latest_transaction.id, coins),
          {:ok, base} <- fetch_base(coins),
-         {:ok, target} <- {:ok, PAMR.run(0.8, 0.9, prices, previous_prices, allocation)},
-         {:ok, trades} <-
-           {:ok, Trades.generate(total * (1 - 0.005), prices, allocation, target, coins)},
-         {:ok, orders} <- ExecuteTrade.execute(trades, base, session, prices, transaction),
-         {:ok, new_balances} <- {:ok, Exchange.get_balance(%BinanceEx{}, coins)},
-         {:ok, new_prices} <- {:ok, Exchange.get_prices(%BinanceEx{}, coins)},
-         {total, new_allocation} <- Allocation.current(balances, prices) do
+         {:ok, target} <- PAMR.run(0.8, 0.9, prices, previous_prices, allocation),
+         {:ok, trades} <- Trades.generate(total * (1 - 0.005), prices, allocation, target, coins),
+         {:ok, orders} <- ExecuteTrade.execute(trades, base, session, prices, latest_transaction),
+         {new_balances, new_prices} <- fetch_market_info(coins),
+         {total, new_allocation} <- Allocation.current(new_balances, new_prices) do
       SessionReport.report(base, session, target, new_balances, new_allocation, total)
     end
   end
@@ -36,18 +40,11 @@ defmodule Pamela.Trader.Rebalance do
   defp continue_with_rebalance(%RebalanceTransaction{} = transaction, %Period{} = period) do
     with {:ok, diff} <- {:ok, Timex.diff(DateTime.utc_now(), transaction.time, :minutes)},
          {val, _rem} <- Float.parse(period.period),
-         {:ok, diff} <- debug_diff(diff),
          {:ok, true} <- {:ok, diff / 60.0 >= val} do
       {:ok, transaction}
     else
       _ -> {:error, :stop}
     end
-  end
-
-  def debug_diff(diff) do
-    IO.puts("Duration diff")
-    IO.inspect(diff)
-    {:ok, diff}
   end
 
   defp fetch_prices([], prices), do: prices
@@ -66,14 +63,14 @@ defmodule Pamela.Trader.Rebalance do
     end
   end
 
-  defp fetch_market_info(%Session{id: id}) do
+  defp fetch_session_coins(%Session{id: id}) do
     case Trading.get_coins_by(session_id: id) do
-      nil ->
-        nil
-
-      coins ->
-        {Exchange.get_balance(%BinanceEx{}, coins), Exchange.get_prices(%BinanceEx{}, coins),
-         coins}
+      nil -> {:error, :not_found}
+      coins -> {:ok, coins}
     end
+  end
+
+  defp fetch_market_info(coins) do
+    {Exchange.get_balance(%BinanceEx{}, coins), Exchange.get_prices(%BinanceEx{}, coins)}
   end
 end

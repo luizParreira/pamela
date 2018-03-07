@@ -4,22 +4,6 @@ defmodule Pamela.PAMR do
   end
 
   def run(insensitivity, aggressiveness, prices, previous_prices, allocation) do
-    IO.puts("Even before")
-    IO.inspect(previous_prices)
-
-    previous_prices =
-      Enum.map(previous_prices, fn {coin, p} ->
-        case Float.parse("#{p}") do
-          {val, _rem} -> {coin, val}
-          _rest -> nil
-        end
-      end)
-
-    IO.puts("Prices")
-    IO.inspect(prices)
-    IO.puts("Previous")
-    IO.inspect(previous_prices)
-
     returns =
       prices
       |> Enum.map(fn {coin, price} ->
@@ -63,9 +47,12 @@ defmodule Pamela.PAMR do
 
     tmax = simplex_proj(next_allocation_sorted, next_allocation_sorted, 0.0, 0.0, 0)
 
-    Enum.map(next_allocation, fn {coin, allo} ->
-      {coin, max(allo - tmax, 0.0)}
-    end)
+    target =
+      Enum.map(next_allocation, fn {coin, allo} ->
+        {coin, max(allo - tmax, 0.0)}
+      end)
+
+    {:ok, target}
   end
 
   defp simplex_proj([{coin, allo}], allocations, tmp, tmax, _i) do

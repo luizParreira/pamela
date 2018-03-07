@@ -18,6 +18,7 @@ defmodule Pamela.Trader.Trades do
       end)
 
     trades = Enum.filter(trades, & &1)
-    Enum.sort(trades, fn {_c, v1}, {_c1, v2} -> v2 >= v1 end)
+    trades = Enum.sort(trades, fn {_c, v1}, {_c1, v2} -> v2 >= v1 end)
+    {:ok, trades}
   end
 end
