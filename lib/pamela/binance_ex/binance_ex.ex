@@ -1,12 +1,22 @@
 defmodule Pamela.BinanceEx do
   defstruct []
+
+  def get_balance(coins) do
+    Exchange.get_balance(coins)
+  end
+
+  def get_prices(coins) do
+    Exchange.get_prices(coins)
+  end
 end
 
 defimpl Exchange, for: Pamela.BinanceEx do
   alias Pamela.BinanceEx.Balance
 
-  def get_balance(self, coins) do
-    case Binance.get_account() do
+  @binance_client Application.get_env(:pamela, :binance_client)
+
+  def get_balance(coins) do
+    case @binance_client.get_account() do
       {:ok, %{"balances" => balances}} ->
         balances
         |> Enum.map(fn %{"asset" => asset, "free" => free, "locked" => locked} ->
@@ -19,8 +29,8 @@ defimpl Exchange, for: Pamela.BinanceEx do
     end
   end
 
-  def get_prices(self, coins) do
-    case Binance.get_all_prices() do
+  def get_prices(coins) do
+    case @binance_client.get_all_prices() do
       {:ok, prices} -> get_prices_for(prices, coins: coins)
       error -> error
     end

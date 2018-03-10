@@ -71,6 +71,6 @@ defmodule Pamela.Trader.Rebalance do
   end
 
   defp fetch_market_info(coins) do
-    {Exchange.get_balance(%BinanceEx{}, coins), Exchange.get_prices(%BinanceEx{}, coins)}
+    {BinanceEx.get_balance(coins), BinanceEx.get_prices(coins)}
   end
 end
