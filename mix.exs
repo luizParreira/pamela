@@ -40,7 +40,7 @@ defmodule Pamela.Mixfile do
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"},
       {:timex, "~> 3.1"},
-      {:nadia, "~> 0.4.2"},
+      {:nadia, git: "https://github.com/zhyu/nadia.git", branch: "master"},
       {:binance,
        git: "https://github.com/luizParreira/binance.ex.git", branch: "implement-balances"}
     ]
