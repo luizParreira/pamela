@@ -14,7 +14,7 @@ defmodule Pamela.Command.Messages do
 
   def trade_intro do
     """
-    Ok, are ready to roll.
+    Ok, we are ready to roll.
 
     First, what is the name this trading session?
 
