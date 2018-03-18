@@ -351,6 +351,10 @@ defmodule Pamela.Trading do
   """
   def get_trade!(id), do: Repo.get!(Trade, id)
 
+  def get_trades_by(transaction_id: id) do
+    Repo.all(from(t in Trade, where: t.rebalance_transaction_id == ^id))
+  end
+
   @doc """
   Creates a trade.
 
@@ -438,30 +442,25 @@ defmodule Pamela.Trading do
 
   ## Examples
 
-      iex> get_rebalance_transaction!(123)
+      iex> get_rebalance_transaction(123)
       %RebalanceTransaction{}
 
-      iex> get_rebalance_transaction!(456)
-      ** (Ecto.NoResultsError)
+      iex> get_rebalance_transaction(456)
+      nil
 
   """
-  def get_rebalance_transaction!(id), do: Repo.get!(RebalanceTransaction, id)
+  def get_rebalance_transaction(id), do: Repo.get(RebalanceTransaction, id)
+
+  def get_rebalance_transactions_by(session_id: id) do
+    Repo.all(from(t in RebalanceTransaction, where: t.session_id == ^id))
+  end
 
   def fetch_latest_transaction(%Session{id: id}) do
     transaction =
       Repo.one(
-        from(transaction in RebalanceTransaction, order_by: [desc: transaction.time], limit: 1)
+        from(transaction in RebalanceTransaction, order_by: [desc: transaction.id], limit: 1)
       )
 
-    {:ok, transaction}
-  end
-
-  defp resolve_transaction(nil, id) do
-    attrs = %{session_id: id, time: DateTime.utc_now()}
-    create_rebalance_transaction(attrs)
-  end
-
-  defp resolve_transaction(transaction, _id) do
     {:ok, transaction}
   end
 
@@ -530,14 +529,16 @@ defmodule Pamela.Trading do
     RebalanceTransaction.changeset(rebalance_transaction, %{})
   end
 
-  def fetch_previous_prices(id, coins) do
+  def fetch_previous_prices(nil, _coins), do: {:ok, []}
+
+  def fetch_previous_prices(transaction, coins) do
     coins = Enum.map(coins, fn c -> c.symbol end)
 
     prices =
       Repo.all(
         from(
           t in Trade,
-          where: t.rebalance_transaction_id == ^id and t.coin in ^coins,
+          where: t.rebalance_transaction_id == ^transaction.id and t.coin in ^coins,
           select: {t.coin, t.price},
           order_by: t.time,
           limit: ^(Enum.count(coins) - 1)

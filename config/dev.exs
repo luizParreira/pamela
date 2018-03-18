@@ -44,3 +44,13 @@ config :pamela, Pamela.Repo,
   database: "pamela_bot_dev",
   hostname: "db",
   pool_size: 10
+
+config :nadia, token: System.get_env("TELEGRAM_TOKEN")
+
+config :pamela, :allowed_user, System.get_env("ALLOWED_USER")
+config :pamela, :telegram_client, Nadia
+config :pamela, :binance_client, Binance
+
+config :binance,
+  api_key: System.get_env("API_KEY"),
+  secret_key: System.get_env("SECRET_KEY")

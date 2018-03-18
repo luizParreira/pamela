@@ -14,7 +14,7 @@ defmodule Pamela.Trader.SessionReport do
     #{total} #{base.symbol}
     """
 
-    Nadia.send_message(session.telegram_user_id, message)
+    Pamela.Telegram.Bot.send_message(session.telegram_user_id, message)
   end
 
   defp format_coins(coins) do

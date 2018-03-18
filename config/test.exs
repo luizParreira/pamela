@@ -17,3 +17,8 @@ config :pamela, Pamela.Repo,
   database: "pamela_bot_test",
   hostname: "db",
   pool: Ecto.Adapters.SQL.Sandbox
+
+config :pamela, :allowed_user, "1"
+
+config :pamela, :telegram_client, NadiaMock
+config :pamela, :binance_client, BinanceMock

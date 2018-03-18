@@ -4,7 +4,7 @@ defmodule Pamela.MessageHandler do
   alias Pamela.Telegram
 
   def handle do
-    case Nadia.get_updates() do
+    case Telegram.Bot.get_updates() do
       {:ok, update} -> parse_updates(update)
       {:error, error} -> error
     end

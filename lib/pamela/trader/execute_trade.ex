@@ -1,4 +1,6 @@
 defmodule Pamela.Trader.ExecuteTrade do
+  @binance_client Application.get_env(:pamela, :binance_client)
+
   def execute(trades, base, session, prices, transaction) do
     trades =
       Enum.map(trades, fn {coin, amount} ->
@@ -15,11 +17,11 @@ defmodule Pamela.Trader.ExecuteTrade do
   end
 
   defp exec(amount, market) when amount > 0 do
-    Binance.order_market_buy(market, amount)
+    @binance_client.order_market_buy(market, amount)
   end
 
   defp exec(amount, market) when amount <= 0 do
-    Binance.order_market_sell(market, -amount)
+    @binance_client.order_market_sell(market, -amount)
   end
 
   defp save_trades(trade, coin, session, prices, transaction, base) do
