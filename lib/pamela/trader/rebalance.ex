@@ -23,8 +23,7 @@ defmodule Pamela.Trader.Rebalance do
              session_id: session.id,
              time: opts[:now]
            }),
-         {:ok, %RebalanceTransaction{} = _transaction} <-
-           continue_with_rebalance(previous_transaction, period, opts[:state]),
+         {:ok, _transaction} <- continue_with_rebalance(previous_transaction, period, opts),
          {:ok, coins} <- fetch_session_coins(session),
          {balances, prices} <- fetch_market_info(coins),
          {total, allocation} <- Allocation.current(balances, prices),
@@ -40,11 +39,13 @@ defmodule Pamela.Trader.Rebalance do
     end
   end
 
-  defp continue_with_rebalance(transaction, nil, _state), do: {:error, :need_period}
-  defp continue_with_rebalance(transaction, _period, :init), do: {:ok, transaction}
+  defp continue_with_rebalance(transaction, _period, state: :init, now: _now),
+    do: {:ok, transaction}
 
-  defp continue_with_rebalance(%RebalanceTransaction{} = transaction, %Period{} = period, _state) do
-    with {:ok, diff} <- {:ok, Timex.diff(DateTime.utc_now(), transaction.time, :minutes)},
+  defp continue_with_rebalance(transaction, nil, _opts), do: {:error, :need_period}
+
+  defp continue_with_rebalance(%RebalanceTransaction{} = transaction, %Period{} = period, opts) do
+    with {:ok, diff} <- {:ok, Timex.diff(opts[:now], transaction.time, :minutes)},
          {val, _rem} <- Float.parse(period.period),
          {:ok, true} <- {:ok, diff / 60.0 >= val} do
       {:ok, transaction}
@@ -77,6 +78,6 @@ defmodule Pamela.Trader.Rebalance do
   end
 
   defp fetch_market_info(coins) do
-    {BinanceEx.get_balance(coins), BinanceEx.get_prices(coins)}
+    {Pamela.BinanceEx.get_balance(coins), Pamela.BinanceEx.get_prices(coins)}
   end
 end
