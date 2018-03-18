@@ -18,12 +18,12 @@ defmodule Pamela.Trader.Rebalance do
   def rebalance(opts) do
     with {session, period} <- fetch_session_info(),
          {:ok, previous_transaction} <- Trading.fetch_latest_transaction(session),
+         {:ok, _transaction} <- continue_with_rebalance(previous_transaction, period, opts),
          {:ok, %RebalanceTransaction{} = current_transaction} <-
            Trading.create_rebalance_transaction(%{
              session_id: session.id,
              time: opts[:now]
            }),
-         {:ok, _transaction} <- continue_with_rebalance(previous_transaction, period, opts),
          {:ok, coins} <- fetch_session_coins(session),
          {balances, prices} <- fetch_market_info(coins),
          {total, allocation} <- Allocation.current(balances, prices),
