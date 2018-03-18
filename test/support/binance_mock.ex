@@ -23,4 +23,24 @@ defmodule BinanceMock do
        %Binance.SymbolPrice{price: "0.00003275", symbol: "XLMBTC"}
      ]}
   end
+
+  def order_market_buy(market, amount) do
+    {:ok,
+     %{
+       "executedQty" => Integer.to_string(amount),
+       "market" => market,
+       "side" => "BUY",
+       "orderId" => 1
+     }}
+  end
+
+  def order_market_sell(market, amount) do
+    {:ok,
+     %{
+       "executedQty" => Integer.to_string(amount),
+       "market" => market,
+       "side" => "SELL",
+       "orderId" => 2
+     }}
+  end
 end
