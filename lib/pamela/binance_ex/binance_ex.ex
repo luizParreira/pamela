@@ -2,11 +2,11 @@ defmodule Pamela.BinanceEx do
   defstruct []
 
   def get_balance(coins) do
-    Exchange.get_balance(coins)
+    Exchange.get_balance(%Pamela.BinanceEx{}, coins)
   end
 
   def get_prices(coins) do
-    Exchange.get_prices(coins)
+    Exchange.get_prices(%Pamela.BinanceEx{}, coins)
   end
 end
 
@@ -15,7 +15,7 @@ defimpl Exchange, for: Pamela.BinanceEx do
 
   @binance_client Application.get_env(:pamela, :binance_client)
 
-  def get_balance(coins) do
+  def get_balance(_self, coins) do
     case @binance_client.get_account() do
       {:ok, %{"balances" => balances}} ->
         balances
@@ -29,7 +29,7 @@ defimpl Exchange, for: Pamela.BinanceEx do
     end
   end
 
-  def get_prices(coins) do
+  def get_prices(_self, coins) do
     case @binance_client.get_all_prices() do
       {:ok, prices} -> get_prices_for(prices, coins: coins)
       error -> error

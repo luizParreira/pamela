@@ -1,4 +1,4 @@
 defprotocol Exchange do
-  def get_balance(coins)
-  def get_prices(coins)
+  def get_balance(self, coins)
+  def get_prices(self, coins)
 end
