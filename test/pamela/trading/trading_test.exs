@@ -320,4 +320,68 @@ defmodule Pamela.TradingTest do
       assert %Ecto.Changeset{} = Trading.change_rebalance_transaction(rebalance_transaction)
     end
   end
+
+  describe "trading_balances" do
+    alias Pamela.Trading.Balance
+
+    @valid_attrs %{balance: 120.5, coin: "some coin", rebalance_transaction_id: 42}
+    @update_attrs %{balance: 456.7, coin: "some updated coin", rebalance_transaction_id: 43}
+    @invalid_attrs %{balance: nil, coin: nil, rebalance_transaction_id: nil}
+
+    def balance_fixture(attrs \\ %{}) do
+      {:ok, balance} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Trading.create_balance()
+
+      balance
+    end
+
+    test "list_trading_balances/0 returns all trading_balances" do
+      balance = balance_fixture()
+      assert Trading.list_trading_balances() == [balance]
+    end
+
+    test "get_balance!/1 returns the balance with given id" do
+      balance = balance_fixture()
+      assert Trading.get_balance!(balance.id) == balance
+    end
+
+    test "create_balance/1 with valid data creates a balance" do
+      assert {:ok, %Balance{} = balance} = Trading.create_balance(@valid_attrs)
+      assert balance.balance == 120.5
+      assert balance.coin == "some coin"
+      assert balance.rebalance_transaction_id == 42
+    end
+
+    test "create_balance/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Trading.create_balance(@invalid_attrs)
+    end
+
+    test "update_balance/2 with valid data updates the balance" do
+      balance = balance_fixture()
+      assert {:ok, balance} = Trading.update_balance(balance, @update_attrs)
+      assert %Balance{} = balance
+      assert balance.balance == 456.7
+      assert balance.coin == "some updated coin"
+      assert balance.rebalance_transaction_id == 43
+    end
+
+    test "update_balance/2 with invalid data returns error changeset" do
+      balance = balance_fixture()
+      assert {:error, %Ecto.Changeset{}} = Trading.update_balance(balance, @invalid_attrs)
+      assert balance == Trading.get_balance!(balance.id)
+    end
+
+    test "delete_balance/1 deletes the balance" do
+      balance = balance_fixture()
+      assert {:ok, %Balance{}} = Trading.delete_balance(balance)
+      assert_raise Ecto.NoResultsError, fn -> Trading.get_balance!(balance.id) end
+    end
+
+    test "change_balance/1 returns a balance changeset" do
+      balance = balance_fixture()
+      assert %Ecto.Changeset{} = Trading.change_balance(balance)
+    end
+  end
 end
