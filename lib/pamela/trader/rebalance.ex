@@ -26,6 +26,7 @@ defmodule Pamela.Trader.Rebalance do
            }),
          {:ok, coins} <- fetch_session_coins(session),
          {balances, prices} <- fetch_market_info(coins),
+         [%Trading.Balance{}] = _balances <- save_balances(balances, current_transaction),
          {total, allocation} <- Allocation.current(balances, prices),
          {:ok, previous_prices} <-
            Trading.fetch_previous_prices(previous_transaction || current_transaction, coins),
@@ -79,5 +80,18 @@ defmodule Pamela.Trader.Rebalance do
 
   defp fetch_market_info(coins) do
     {Pamela.BinanceEx.get_balance(coins), Pamela.BinanceEx.get_prices(coins)}
+  end
+
+  defp save_balances(balances, transaction) do
+    Enum.map(balances, fn {coin, balance} ->
+      case Trading.create_balance(%{
+             balance: balance,
+             coin: coin,
+             rebalance_transaction_id: transaction.id
+           }) do
+        {:ok, balance} -> balance
+        {:error, error} -> error
+      end
+    end)
   end
 end
