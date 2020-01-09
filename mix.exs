@@ -4,7 +4,7 @@ defmodule Pamela.Mixfile do
   def project do
     [
       app: :pamela,
-      version: "0.0.1",
+      version: "0.1.0",
       elixir: "~> 1.6",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
@@ -33,16 +33,16 @@ defmodule Pamela.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.3.0"},
-      {:phoenix_pubsub, "~> 1.0"},
-      {:phoenix_ecto, "~> 3.2"},
+      {:phoenix, "~> 1.4.9"},
+      {:phoenix_pubsub, "~> 1.1"},
+      {:phoenix_ecto, "~> 4.0"},
+      {:ecto_sql, "~> 3.1"},
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
-      {:cowboy, "~> 1.0"},
+      {:plug_cowboy, "~> 2.0"},
       {:timex, "~> 3.1"},
-      {:nadia, git: "https://github.com/zhyu/nadia.git", branch: "master"},
-      {:binance,
-       git: "https://github.com/luizParreira/binance.ex.git", branch: "implement-balances"}
+      {:nadia, "~> 0.6.0"},
+      {:binance, "~> 0.7.1"}
     ]
   end
 
