@@ -1,18 +1,22 @@
-FROM elixir:1.6.0-alpine
+FROM postgres:11.5-alpine AS postgres
+
+FROM elixir:1.9.1-alpine
+EXPOSE 4000
+
+ENV APP_PATH /app
 
 RUN mix local.hex --force \
   && mix local.rebar --force \
-  && apk --no-cache --update add postgresql-client bash git \
+  && apk --no-cache --update add bash alpine-sdk coreutils curl postgresql-client \
   && rm -rf /var/cache/apk/* \
-  && mkdir /app
+  && mkdir $APP_PATH
 
-COPY . /app
-WORKDIR /app
+COPY --from=postgres /usr/local/bin/pg_dump /usr/local/bin/pg_dump
+
+COPY . $APP_PATH
+WORKDIR $APP_PATH
 
 RUN mix deps.get
 
 RUN echo "America/Sao_Paulo" > /etc/timezone
-
-EXPOSE 4000
-
 CMD ["mix", "phx.server"]
