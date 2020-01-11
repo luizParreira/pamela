@@ -15,25 +15,25 @@ use Mix.Config
 # which you typically run after static files are built.
 config :pamela, PamelaWeb.Endpoint,
   load_from_system_env: true,
-  url: [scheme: "https", host: "pamela-bot.herokuapp.com", port: 443],
+  url: [scheme: "https", host: "${HOST}", port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  secret_key_base: System.get_env("SECRET_KEY_BASE")
+  secret_key_base: "${SECRET_KEY_BASE}"
 
 config :pamela, Pamela.Repo,
   adapter: Ecto.Adapters.Postgres,
-  url: System.get_env("DATABASE_URL"),
+  url: "${DATABASE_URL}",
   pool_size: 15,
   ssl: true
 
-config :nadia, token: System.get_env("TELEGRAM_TOKEN")
+config :nadia, token: "${TELEGRAM_TOKEN}"
 
-config :pamela, :allowed_user, System.get_env("ALLOWED_USER")
+config :pamela, :allowed_user, "${ALLOWED_USER}"
 config :pamela, :telegram_client, Nadia
 config :pamela, :binance_client, Binance
 
 config :binance,
-  api_key: System.get_env("API_KEY"),
-  secret_key: System.get_env("SECRET_KEY")
+  api_key: "${API_KEY}",
+  secret_key: "${SECRET_KEY}"
 
 # Do not print debug messages in production
 config :logger, level: :info
