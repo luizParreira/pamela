@@ -458,7 +458,11 @@ defmodule Pamela.Trading do
   def fetch_latest_transaction(%Session{id: id}) do
     transaction =
       Repo.one(
-        from(transaction in RebalanceTransaction, order_by: [desc: transaction.id], limit: 1)
+        from(transaction in RebalanceTransaction,
+          where: transaction.session_id == ^id,
+          order_by: [desc: transaction.id],
+          limit: 1
+        )
       )
 
     {:ok, transaction}

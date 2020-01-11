@@ -27,9 +27,9 @@ defmodule Pamela.Command.Trade.Confirmation do
     end
   end
 
-  defp run_positive_confirmation(command, user) do
+  defp run_positive_confirmation(command, _user) do
     case Telegram.update_command(command, %{executed: true}) do
-      {:ok, cmd} ->
+      {:ok, _cmd} ->
         Pamela.Trader.rebalance(state: :init, now: DateTime.utc_now())
 
       error ->

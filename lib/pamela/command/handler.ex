@@ -2,14 +2,13 @@ defmodule Pamela.Command.Handler do
   alias Nadia.Model.{User, Message}
   alias Pamela.User.TelegramUser
   alias Pamela.Telegram.Command
-  alias Pamela.Command
   alias Pamela.Command.Executor
   alias Pamela.Telegram
 
   def handle(id, %Message{} = message, :command) do
     {:ok, %TelegramUser{} = user} = parse_user(message.from)
 
-    {:ok, %Telegram.Message{} = msg} =
+    {:ok, %Telegram.Message{} = _msg} =
       Pamela.Telegram.create_message(%{
         user_id: user.id,
         update_id: id,
@@ -23,7 +22,7 @@ defmodule Pamela.Command.Handler do
   def handle(id, %Message{} = message, :message) do
     {:ok, %TelegramUser{} = user} = parse_user(message.from)
 
-    {:ok, %Telegram.Message{} = msg} =
+    {:ok, %Telegram.Message{} = _msg} =
       Pamela.Telegram.create_message(%{
         user_id: user.id,
         update_id: id,
@@ -38,7 +37,7 @@ defmodule Pamela.Command.Handler do
     end
   end
 
-  def handle(nil, _message, msg), do: {:error, :unknown_message}
+  def handle(nil, _message, _msg), do: {:error, :unknown_message}
 
   def handle(_id, _msg, _flag), do: {:error, :unknown_message}
 

@@ -6,7 +6,7 @@ defmodule Pamela.Command.Start do
 
   def run(%Command{} = command, %TelegramUser{} = user) do
     case Nadia.send_message(user.id, Messages.intro(user)) do
-      {:ok, message} -> update_command(command)
+      {:ok, _message} -> update_command(command)
       error -> {:error, error}
     end
   end

@@ -1,5 +1,4 @@
 defmodule Pamela.Command.Trade.Init do
-  alias Pamela.Telegram.CommandMessage
   alias Pamela.Command.Messages
   alias Pamela.Telegram
   alias Pamela.Trading

@@ -8,7 +8,7 @@ defmodule Pamela.PAMR do
       prices
       |> Enum.map(fn {coin, price} ->
         {_coin, previous_price} =
-          Enum.find(previous_prices, fn {price_coin, price} ->
+          Enum.find(previous_prices, fn {price_coin, _price} ->
             price_coin == coin
           end)
 
@@ -20,7 +20,7 @@ defmodule Pamela.PAMR do
 
     returns_sum =
       returns
-      |> Enum.map(fn {coin, ret} -> ret end)
+      |> Enum.map(fn {_coin, ret} -> ret end)
       |> Enum.sum()
 
     mean = returns_sum / Enum.count(returns)
@@ -55,14 +55,14 @@ defmodule Pamela.PAMR do
     {:ok, target}
   end
 
-  defp simplex_proj([{coin, allo}], allocations, tmp, tmax, _i) do
+  defp simplex_proj([{_coin, _allo}], allocations, tmp, _tmax, _i) do
     count = Enum.count(allocations)
-    {coin, alloc} = Enum.at(allocations, count - 1)
+    {_coin, alloc} = Enum.at(allocations, count - 1)
     (tmp + alloc - 1.0) / (count * 1.0)
   end
 
-  defp simplex_proj([{coin, allo} | tail], allocations, tmpsum, tmax, i) do
-    {coin, val} = Enum.at(tail, 0)
+  defp simplex_proj([{_coin, _allo} | tail], allocations, tmpsum, _tmax, i) do
+    {_coin, val} = Enum.at(tail, 0)
     tmpsum = tmpsum + val
     tmax = (tmpsum - 1.0) / (i + 1.0)
 
@@ -77,7 +77,7 @@ defmodule Pamela.PAMR do
     allocation
     |> Enum.map(fn {coin, allocation} ->
       {_coin, asset_return} =
-        Enum.find(returns, fn {coin_return, return} ->
+        Enum.find(returns, fn {coin_return, _return} ->
           coin === coin_return
         end)
 
