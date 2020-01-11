@@ -1,7 +1,6 @@
 defmodule Pamela.Trading.FormatCoins do
   def format(coins) do
     base = Enum.find(coins, fn coin -> coin.base end)
-    trading_coins = Enum.filter(coins, fn coin -> !coin.base end)
 
     symbols = Enum.map(coins, fn coin -> coin.symbol end)
 

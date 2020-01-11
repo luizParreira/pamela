@@ -14,9 +14,6 @@ defmodule Pamela.User.TelegramUser do
   end
 
   @doc false
-  def changeset(%Nadia.Model.User{} = telegram_user, attrs),
-    do: execute_changeset(telegram_user, attrs)
-
   def changeset(%TelegramUser{} = telegram_user, attrs),
     do: execute_changeset(telegram_user, attrs)
 

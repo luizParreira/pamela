@@ -8,8 +8,12 @@ defmodule Pamela.Trader.ExecuteTrade do
         market = "#{coin}#{base.symbol}"
 
         case exec(amount_trunc, market) do
-          {:ok, trade} -> save_trades(trade, coin, session, prices, transaction, base)
-          {:error, error} -> save_trades(%{}, coin, session, prices, transaction, base)
+          {:ok, trade} ->
+            save_trades(trade, coin, session, prices, transaction, base)
+
+          {:error, error} ->
+            IO.inspect(error)
+            {:error, error}
         end
       end)
 
@@ -24,8 +28,8 @@ defmodule Pamela.Trader.ExecuteTrade do
     @binance_client.order_market_sell(market, -amount)
   end
 
-  defp save_trades(trade, coin, session, prices, transaction, base) do
-    {_coin, price} = Enum.find(prices, fn {symbol, p} -> symbol === coin end)
+  defp save_trades(trade, coin, _session, prices, transaction, base) do
+    {_coin, price} = Enum.find(prices, fn {symbol, _p} -> symbol === coin end)
 
     attrs = %{
       amount: trade["executedQty"],
@@ -39,8 +43,12 @@ defmodule Pamela.Trader.ExecuteTrade do
     }
 
     case Pamela.Trading.create_trade(attrs) do
-      {:ok, trs} -> {:ok, trs}
-      {:error, error} -> IO.inspect(error)
+      {:ok, trs} ->
+        {:ok, trs}
+
+      {:error, error} ->
+        IO.inspect(error)
+        {:error, error}
     end
   end
 
