@@ -40,7 +40,7 @@ config :phoenix, :stacktrace_depth, 20
 config :pamela, Pamela.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
-  password: "postgres",
+  password: "pamela",
   database: "pamela_bot_dev",
   hostname: "db",
   pool_size: 10
