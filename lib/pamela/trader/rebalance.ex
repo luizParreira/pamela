@@ -1,13 +1,11 @@
 defmodule Pamela.Trader.Rebalance do
   alias Pamela.Trading.Session
   alias Pamela.Trader.Allocation
-  alias Pamela.BinanceEx
   alias Pamela.PAMR
   alias Pamela.Trading
   alias Pamela.Trader.Trades
   alias Pamela.Trader.ExecuteTrade
   alias Pamela.Trader.SessionReport
-  alias Timex.Duration
   alias Pamela.Trading.RebalanceTransaction
   alias Pamela.Trading.Period
 
@@ -26,7 +24,7 @@ defmodule Pamela.Trader.Rebalance do
            }),
          {:ok, coins} <- fetch_session_coins(session),
          {balances, prices} <- fetch_market_info(coins),
-         [%Trading.Balance{}] = _balances <- save_balances(balances, current_transaction),
+         _balances <- save_balances(balances, current_transaction),
          {total, allocation} <- Allocation.current(balances, prices),
          {:ok, previous_prices} <-
            Trading.fetch_previous_prices(previous_transaction || current_transaction, coins),
