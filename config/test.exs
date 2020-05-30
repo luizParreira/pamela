@@ -13,7 +13,7 @@ config :logger, level: :warn
 config :pamela, Pamela.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "postgres",
-  password: "postgres",
+  password: "pamela",
   database: "pamela_bot_test",
   hostname: "db",
   pool: Ecto.Adapters.SQL.Sandbox
