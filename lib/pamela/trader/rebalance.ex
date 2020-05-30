@@ -81,8 +81,8 @@ defmodule Pamela.Trader.Rebalance do
     {Pamela.BinanceEx.get_balance(coins), Pamela.BinanceEx.get_prices(coins)}
   end
 
-  defp save_balances({:ok, balances}, transaction) do
-    Enum.map(balances.balances, fn {coin, balance} ->
+  defp save_balances(balances, transaction) do
+    Enum.map(balances, fn {coin, balance} ->
       case Trading.create_balance(%{
              balance: balance,
              coin: coin,
