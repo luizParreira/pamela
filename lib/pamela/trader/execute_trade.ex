@@ -4,7 +4,7 @@ defmodule Pamela.Trader.ExecuteTrade do
   def execute(trades, base, session, prices, transaction) do
     trades =
       Enum.map(trades, fn {coin, amount} ->
-        amount_trunc = trunc_amount(amount)
+        amount_trunc = :erlang.float_to_binary(amount, decimals: 8)
         market = "#{coin}#{base.symbol}"
 
         case exec(amount_trunc, market) do
@@ -21,10 +21,12 @@ defmodule Pamela.Trader.ExecuteTrade do
   end
 
   defp exec(amount, market) when amount > 0 do
+    IO.inspect("ORDER: #{amount} MARKET: #{market}")
     @binance_client.order_market_buy(market, amount)
   end
 
   defp exec(amount, market) when amount <= 0 do
+    IO.inspect("ORDER: #{amount} MARKET: #{market}")
     @binance_client.order_market_sell(market, -amount)
   end
 
