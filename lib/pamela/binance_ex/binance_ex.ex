@@ -17,7 +17,7 @@ defimpl Exchange, for: Pamela.BinanceEx do
 
   def get_balance(_self, coins) do
     case @binance_client.get_account() do
-      {:ok, %{"balances" => balances}} ->
+      {:ok, %Binance.Account{balances: balances}} ->
         balances
         |> Enum.map(fn %{"asset" => asset, "free" => free, "locked" => locked} ->
           %Balance{asset: asset, free: free, locked: locked}
