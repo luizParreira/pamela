@@ -42,6 +42,9 @@ defmodule Pamela.Trader.Rebalance do
   defp continue_with_rebalance(transaction, _period, state: :init, now: _now),
     do: {:ok, transaction}
 
+  defp continue_with_rebalance(nil, _period, _opts),
+    do: {:ok, nil}
+
   defp continue_with_rebalance(_transaction, nil, _opts), do: {:error, :need_period}
 
   defp continue_with_rebalance(%RebalanceTransaction{} = transaction, %Period{} = period, opts) do
