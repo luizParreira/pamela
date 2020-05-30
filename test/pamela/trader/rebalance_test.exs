@@ -42,7 +42,7 @@ defmodule Pamela.Trader.RebalanceTest do
     test "user starts a rebalancing on the initial state" do
       {:ok, session, period, coins} = init_rebalance_fixture()
       now = DateTime.utc_now()
-      {:ok, _msg} = Trader.rebalance(state: :init, now: now)
+      Trader.rebalance(state: :init, now: now)
 
       transactions = Trading.get_rebalance_transactions_by(session_id: session.id)
       [transaction] = transactions
