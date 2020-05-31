@@ -75,8 +75,6 @@ defmodule Pamela.Trader.ExecuteTrade do
   defp save_trades(trade, coin, _session, prices, transaction, base) do
     {_coin, price} = Enum.find(prices, fn {symbol, _p} -> symbol === coin end)
 
-    {order_id, _} = Integer.parse(trade["orderId"])
-
     attrs = %{
       amount: trade["executedQty"],
       base: base.symbol,
@@ -84,7 +82,7 @@ defmodule Pamela.Trader.ExecuteTrade do
       price: Float.to_string(price),
       rebalance_transaction_id: transaction.id,
       side: trade["side"],
-      order_id: order_id,
+      order_id: trade["orderId"],
       time: DateTime.utc_now()
     }
 
