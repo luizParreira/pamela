@@ -29,7 +29,7 @@ defmodule Pamela.Trader.Rebalance do
          {:ok, previous_prices} <-
            Trading.fetch_previous_prices(previous_transaction || current_transaction, coins),
          {:ok, base} <- fetch_base(coins),
-         {:ok, target} <- PAMR.run(0.8, 0.9, prices, previous_prices, allocation),
+         {:ok, target} <- PAMR.run(0.5, 500, prices, previous_prices, allocation),
          {:ok, trades} <- Trades.generate(total * (1 - 0.005), prices, allocation, target, coins),
          {:ok, _orders} <-
            ExecuteTrade.execute(trades, base, session, prices, current_transaction),
