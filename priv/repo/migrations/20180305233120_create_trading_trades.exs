@@ -9,7 +9,7 @@ defmodule Pamela.Repo.Migrations.CreateTradingTrades do
       add(:coin, :string)
       add(:price, :string)
       add(:amount, :string)
-      add(:order_id, :integer)
+      add(:order_id, :bigint)
       add(:time, :utc_datetime)
 
       timestamps()
